@@ -5,6 +5,7 @@ const UpdatePresets = require('./presets')
 const UpdateActions = require('./actions')
 const UpdateFeedbacks = require('./feedbacks')
 const UpdateVariableDefinitions = require('./variables')
+fetchedCueType = "";
 
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
@@ -14,12 +15,12 @@ class ModuleInstance extends InstanceBase {
 	async init(config) {
 		this.config = config
 
-		this.updateStatus(InstanceStatus.Ok)
-
 		this.updatePresets();
 		this.updateActions() // export actions
 		this.updateFeedbacks() // export feedbacks
 		this.updateVariableDefinitions() // export variable definitions
+
+		this.updateStatus(InstanceStatus.Ok) // Updates Connection Status
 	}
 	// When module gets deleted
 	async destroy() {
@@ -49,6 +50,66 @@ class ModuleInstance extends InstanceBase {
 
 	updateVariableDefinitions() {
 		UpdateVariableDefinitions(this)
+	}
+
+	async sendCommand(body)
+	{
+		let url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
+		console.log(`Sending command to ${url}`, body);
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(body),
+			});
+
+			if (!response.ok) {
+				// Maybe handle types of status codes
+				console.error(`Network response was not OK: ${response.status}`);
+			} else {
+				const jsonResponse = await response.text(); // Converting object to json caused some issues
+				fetchedCueType = body["cueType"];
+			}
+		} catch (error) {
+			console.error('Error in POST request:', error);
+		}
+		this.checkFeedbacks('Ack_Cue');
+		//this.checkFeedbacks('NextAck','BackAck','BlackoutAck');
+	}
+
+	async fetchCues(body)
+	{
+		fetchedCueType = "";
+		let url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
+		try {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				}
+			});
+	
+			if (!response.ok) {
+				console.error(`Network response was not OK: ${response.status}`);
+			} else {
+				const jsonResponse = await response.json();
+				let cueAge = jsonResponse.now - jsonResponse.at;
+				if (cueAge < 1500) {
+					// We've had a cue recently
+					if (jsonResponse.at != this.lastCueAt) {
+						this.lastCueAt = jsonResponse.at;
+						fetchedCueType = jsonResponse.type;
+					}
+				}
+				console.log('GET request successful:', jsonResponse);
+			}
+		} catch (error) {
+			console.error('Error in GET request:', error);
+		}
+		this.checkFeedbacks('Ack_Cue');
+		//this.checkFeedbacks('NextAck','BackAck','BlackoutAck');
 	}
 }
 
