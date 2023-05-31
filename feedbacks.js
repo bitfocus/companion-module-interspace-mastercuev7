@@ -12,15 +12,18 @@ module.exports = async function (self) {
 				color: combineRgb(0, 0, 0),
 			},
 			callback: async (feedback) => {
+				var type = fetchedCueType;
+				if (type == "forward") { type = "next"; } //...
 				// This button isn't of cueType
-				if (feedback.options.cueType != fetchedCueType) {
+				if (feedback.options.cueType != type) {
 					return { bgcolor: combineRgb(100, 100, 100)};
 				}
-				if (fetchedCueType == "next" || fetchedCueType == "forward") {
+				if (type == "forward") {
+					console.log("green!");
 					return { bgcolor: combineRgb(0, 255, 0) };
-				} else if (fetchedCueType == "back") {
+				} else if (type == "back") {
 					return { bgcolor: combineRgb(255, 0, 0) };
-				} else if (fetchedCueType == "black") {
+				} else if (type == "black") {
 					return { bgcolor: combineRgb(0, 0, 0) };
 				}
 				return { bgcolor: combineRgb(0, 100, 0)};

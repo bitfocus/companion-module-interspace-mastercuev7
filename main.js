@@ -5,6 +5,7 @@ const UpdatePresets = require('./presets')
 const UpdateActions = require('./actions')
 const UpdateFeedbacks = require('./feedbacks')
 const UpdateVariableDefinitions = require('./variables')
+updateTimer = 0;
 fetchedCueType = "";
 
 class ModuleInstance extends InstanceBase {
@@ -20,6 +21,7 @@ class ModuleInstance extends InstanceBase {
 		this.updateFeedbacks() // export feedbacks
 		this.updateVariableDefinitions() // export variable definitions
 
+		this.checkCues();
 		this.updateStatus(InstanceStatus.Ok) // Updates Connection Status
 	}
 	// When module gets deleted
@@ -52,6 +54,12 @@ class ModuleInstance extends InstanceBase {
 		UpdateVariableDefinitions(this)
 	}
 
+	checkCues() {
+		clearTimeout(updateTimer);
+		this.fetchCues();
+    	updateTimer = setTimeout(() => { this.checkCues(); }, 500);
+	}
+
 	async sendCommand(body)
 	{
 		let url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
@@ -76,7 +84,6 @@ class ModuleInstance extends InstanceBase {
 			console.error('Error in POST request:', error);
 		}
 		this.checkFeedbacks('Ack_Cue');
-		//this.checkFeedbacks('NextAck','BackAck','BlackoutAck');
 	}
 
 	async fetchCues(body)
@@ -109,7 +116,6 @@ class ModuleInstance extends InstanceBase {
 			console.error('Error in GET request:', error);
 		}
 		this.checkFeedbacks('Ack_Cue');
-		//this.checkFeedbacks('NextAck','BackAck','BlackoutAck');
 	}
 }
 
