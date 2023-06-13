@@ -5,8 +5,15 @@ const UpdatePresets = require('./presets')
 const UpdateActions = require('./actions')
 const UpdateFeedbacks = require('./feedbacks')
 const UpdateVariableDefinitions = require('./variables')
-updateTimer = 0;
-fetchedCueType = "";
+
+const { combineRgb } = require('@companion-module/base')
+const DefaultGrey = combineRgb(100, 100, 100);
+const ColorBlack = combineRgb(0, 0, 0);
+
+fastTimer = 0;
+slowTimer = 0;
+fetchedCueType = '';
+fetchedPortData = [];
 
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
@@ -15,18 +22,19 @@ class ModuleInstance extends InstanceBase {
 
 	async init(config) {
 		this.config = config
-
-		this.updatePresets();
+		
 		this.updateActions() // export actions
 		this.updateFeedbacks() // export feedbacks
 		this.updateVariableDefinitions() // export variable definitions
+		this.updatePresets();
 
 		this.checkCues();
+		this.checkSettings();
 		this.updateStatus(InstanceStatus.Ok) // Updates Connection Status
 	}
 	// When module gets deleted
 	async destroy() {
-		console.log("Destroy");
+		console.log('Destroy');
 	}
 
 	async configUpdated(config) {
@@ -54,18 +62,46 @@ class ModuleInstance extends InstanceBase {
 		UpdateVariableDefinitions(this)
 	}
 
+	filterResponseLog(response) {
+		if (response.ok) return;
+		if (response.status == 404) {
+			console.error('Page not found');
+		} else if (response.status == 500) {
+			console.error('Server error');
+		} else if (!response.ok) {
+			console.error(`HTTP error! status: ${response.status}`);
+		} else {
+			console.error(`Error in request: ${response}`);
+		}
+	}
+
+	// See https://nodejs.org/api/errors.html#nodejs-error-codes
+	filterErrorLog(error) {
+		if (error.cause.code == 'UND_ERR_CONNECT_TIMEOUT') {
+			console.error('Connection timeout (Check IP config)');
+		} else {
+			console.log(error.cause);
+		}
+	}
+
 	checkCues() {
-		clearTimeout(updateTimer);
+		clearTimeout(fastTimer);
 		this.fetchCues();
-    	updateTimer = setTimeout(() => { this.checkCues(); }, 500);
+    	fastTimer = setTimeout(() => { this.checkCues(); }, 500);
+	}
+
+	checkSettings() {
+		clearTimeout(slowTimer);
+		this.fetchSettings();
+    	slowTimer = setTimeout(() => { this.checkSettings(); }, 2000);
 	}
 
 	async sendCommand(body)
 	{
 		let url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
-		console.log(`Sending command to ${url}`, body);
+		console.log(`Sending command to ${url}:`, body);
 		try {
-			const response = await fetch(url, {
+			const commandResponse = await fetch(url, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -73,49 +109,76 @@ class ModuleInstance extends InstanceBase {
 				body: JSON.stringify(body),
 			});
 
-			if (!response.ok) {
-				// Maybe handle types of status codes
-				console.error(`Network response was not OK: ${response.status}`);
-			} else {
-				const jsonResponse = await response.text(); // Converting object to json caused some issues
-				fetchedCueType = body["cueType"];
+			if (commandResponse.ok) {
+				fetchedCueType = body['cueType'];
 			}
+			this.filterResponseLog(commandResponse);
 		} catch (error) {
-			console.error('Error in POST request:', error);
+			this.filterErrorLog(error);
 		}
-		this.checkFeedbacks('Ack_Cue');
+		this.checkFeedbacks('ack_cue_feedback');
 	}
 
 	async fetchCues(body)
 	{
-		fetchedCueType = "";
+		fetchedCueType = '';
 		let url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
+		console.log(`Fetching cues from ${url}`);
 		try {
-			const response = await fetch(url, {
+			const cueResponse = await fetch(url, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
 				}
 			});
 	
-			if (!response.ok) {
-				console.error(`Network response was not OK: ${response.status}`);
-			} else {
-				const jsonResponse = await response.json();
+			if (cueResponse.ok) {
+				const jsonResponse = await cueResponse.json();
 				let cueAge = jsonResponse.now - jsonResponse.at;
+				// We've had a cue recently
 				if (cueAge < 1500) {
-					// We've had a cue recently
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at;
 						fetchedCueType = jsonResponse.type;
 					}
 				}
-				console.log('GET request successful:', jsonResponse);
+				//console.log('GET request successful:', jsonResponse);
 			}
+			this.filterResponseLog(cueResponse);
 		} catch (error) {
-			console.error('Error in GET request:', error);
+			this.filterErrorLog(error);
 		}
-		this.checkFeedbacks('Ack_Cue');
+		this.checkFeedbacks('ack_cue_feedback');
+	}
+
+	async fetchSettings(body)
+	{
+		fetchedCueType = '';
+		let url = `http://${this.config.unitIP}/settings/${this.config.unitId}`;
+		console.log(`Fetching settings from ${url}`);
+		try {
+			const settingsResponse = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				}
+			});
+	
+			if (settingsResponse.ok) {
+				const jsonResponse = await settingsResponse.json();
+				const outputChannels = jsonResponse.state.outputChannels;
+				fetchedPortData = [];
+				outputChannels.forEach((outputChannel, index) => {
+					//console.log(`Output Channel ${index + 1}: isOn: ${outputChannel.isOn}`);
+					fetchedPortData.push(outputChannel.isOn);
+				});
+				//console.log('GET request successful:', jsonResponse);
+			}
+			this.filterResponseLog(settingsResponse);
+		} catch (error) {
+			this.filterErrorLog(error);
+		}
+		this.checkFeedbacks('Output_State');
 	}
 }
 

@@ -3,8 +3,9 @@ const Fields = require('./fields')
 module.exports = function (self) {
 
 	self.setActionDefinitions({
-		get_cues: {
+		get_cue_action: {
 			name: 'Get Cues',
+			description: 'Manual fetching of cues',
 			options: [],
 			callback: async(event) => {
 				await self.fetchCues();
@@ -12,6 +13,7 @@ module.exports = function (self) {
 		},
 		send_cue_action: {
 			name: 'Send Cue',
+			description: 'Send specified Cue to configured device',
 			options: [Fields.CueType],
 			callback: async(event) => {
 				await self.sendCommand({ 'command': 'cue', 'cueType': `${event.options.cueType}` });
@@ -19,6 +21,7 @@ module.exports = function (self) {
 		},
 		set_output_action: {
 			name: 'Set Output',
+			description: 'Set the State of an Output',
 			options: [Fields.Port, Fields.OutputState],
 			callback: async(event) => {
 				await self.sendCommand({ 'command': event.options.outputState, 'index': event.options.outputSingle-1 });
@@ -26,6 +29,7 @@ module.exports = function (self) {
 		},
 		set_multi_output_action: {
 			name: 'Set Outputs',
+			description: 'Set the State of multiple Outputs',
 			options: [Fields.MultiPort, Fields.OutputState],
 			callback: async(event) => {
 				for (const outputNumber of event.options.outputMulti) {
@@ -35,6 +39,7 @@ module.exports = function (self) {
 		},
 		suspend_action: {
 			name: 'Suspend All Outputs',
+			description: 'Suspends all Outputs',
 			options: [],
 			callback: async(event) => {
 				await self.sendCommand({ 'command': 'suspendOutputs' });
@@ -42,6 +47,7 @@ module.exports = function (self) {
 		},
 		resume_action: {
 			name: 'Resume All Outputs',
+			description: 'Resumes all Outputs',
 			options: [],
 			callback: async(event) => {
 				await self.sendCommand({ 'command': 'resumeOutputs' });

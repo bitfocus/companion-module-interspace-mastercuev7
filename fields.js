@@ -1,29 +1,14 @@
+
 const Regex = require('@companion-module/base')
 
 module.exports = {
-	/*
-	Url: (label) => ({
-		id: 'url',
-		type: 'textinput',
-		label: label,
-		default: '',
-		useVariables: true,
-	}),
-	PollInterval: {
-		id: 'interval',
-		type: 'number',
-		label: 'Poll Interval (ms) (0 to disable)',
-		default: 0,
-		min: 0,
-	},
-	*/
-
 	UnitIP: {
 		id: 'unitIP',
 		type: 'textinput',
 		label: 'MasterCue IP Address (shown on screen)',
 		width: 8,
 		regex: Regex.IP,
+		default: '123.456.7.8',
 	},
 
 	UnitID: {
@@ -32,22 +17,22 @@ module.exports = {
 		label: 'MasterCue ID (shown on screen)',
 		width: 8,
 		regex: "/^[0-9]+\\-[0-9]+\\-[0-9]+$/",
+		default: '001-123-456',
 	},
 
 	Port: {
-		id: 'outputSingle',
+		id: 'outputNumber',
 		type: 'number',
 		label: 'Output Number',
-		default: 1,
 		min: 1,
 		max: 6,
+		default: 1,
 	},
 
 	MultiPort: {
-		id: 'outputMulti',
+		id: 'outputNumbers',
 		type: 'multidropdown',
 		label: 'Output Numbers',
-		default: '1',
 		tooltip: 'Which ports do you want to affect?',
 		choices: [
 			{ id: '1', label: 'Output 1' },
@@ -56,30 +41,31 @@ module.exports = {
 			{ id: '4', label: 'Output 4' },
 			{ id: '5', label: 'Output 5' },
 			{ id: '6', label: 'Output 6' }
-		]
+		],
+		default: '1',
 	},
 
 	OutputState: {
 		id: 'outputState',
 		type: 'dropdown',
 		label: 'Setting',
-		default: 'outputOn',
 		choices: [
 			{ id: 'outputOn', label: 'Enabled' },
 			{ id: 'outputOff', label: 'Disabled' },
 			{ id: 'outputToggle', label: 'Toggle' },
-		]
+		],
+		default: 'outputOn',
 	},
 
 	CueType: {
 		id: 'cueType',
 		type: 'dropdown',
 		label: 'Cue Type',
-		default: 'next',
 		choices: [
 			{ id: 'next', label: 'Next' },
 			{ id: 'back', label: 'Back' },
 			{ id: 'black', label: 'Blackout' },
 		],
+		default: 'next',
 	},
 };

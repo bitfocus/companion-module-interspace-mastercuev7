@@ -1,41 +1,154 @@
 const { combineRgb } = require('@companion-module/base')
 
 module.exports = async function (self) {
-	console.log("Init presets here"); // WORKING
+	const ColorWhite = combineRgb(255, 255, 255)
+	const ColorGrey = combineRgb(100, 100, 100);
+	const ColorBlack = combineRgb(0, 0, 0);
+	
 	self.setPresetDefinitions({
-		my_first_preset : {
-			type: 'button', // This must be 'button' for now
-			category: 'Test', // This groups presets into categories in the ui. Try to create logical groups to help users find presets
-			name: `My button`, // A name for the preset. Shown to the user when they hover over it
-			style: [{
-				// This is the minimal set of style properties you must define
-				text: `Test`, // You can use variables from your module here
-				size: 'auto',
-				color: combineRgb(255, 255, 255),
-				bgcolor: combineRgb(0, 0, 0),
-			},{// This is the minimal set of style properties you must define
-				text: `$(generic-module:some-variable)`, // You can use variables from your module here
-				size: '12pt',
-				color: combineRgb(255, 255, 255),
-				bgcolor: combineRgb(0, 0, 0),
+		NextCue : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Next Cue',
+			size: '14',
+			style: {
+				text: 'Next',
+				color: ColorWhite,
+				bgcolor: ColorGrey,
+			},
+			steps: [{
+					down: [{
+						actionId: 'send_cue_action',
+						options: {
+							cueType: 'next'
+						}
+					}],
+					up: []
 			}],
-			steps: [
-				{
-					down: [
-						{
-							// add an action on down press
-							actionId: 'my-action',
-							options: {
-								// options values to use
-								brightness: 100,
-							},
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [], // You can add some presets from your module here
-		}
-		
+			feedbacks: [{
+					feedbackId: 'ack_cue_feedback',
+					options: {
+						cueType: 'next'
+					}
+			}]
+		},
+		BackCue : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Back Cue',
+			size: '14',
+			style: {
+				text: 'Back',
+				color: ColorWhite,
+				bgcolor: ColorGrey,
+			},
+			steps: [{
+					down: [{
+						actionId: 'send_cue_action',
+						options: {
+							cueType: 'back'
+						}
+					}],
+					up: []
+			}],
+			feedbacks: [{
+					feedbackId: 'ack_cue_feedback',
+					options: {
+						cueType: 'back'
+					}
+			}]
+		},
+		BlackoutCue : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Blackout Cue',
+			style: {
+				text: 'Blackout',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorGrey,
+			},
+			steps: [{
+					down: [{
+						actionId: 'send_cue_action',
+						options: {
+							cueType: 'black'
+						}
+					}],
+					up: []
+			}],
+			feedbacks: [{
+					feedbackId: 'ack_cue_feedback',
+					options: {
+						cueType: 'black'
+					}
+			}]
+		},
+		OutputEnable : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Output Enable',
+			style: {
+				text: '1\\nON',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_output_action',
+						options: {
+							outputNumber: 1,
+							outputState: 'outputOn'
+						}
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
+		OutputDisable : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Output Disable',
+			style: {
+				text: '1\\nOFF',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_output_action',
+						options: {
+							outputNumber: 1,
+							outputState: 'outputOff'
+						}
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
+		OutputToggle : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Output Toggle',
+			style: {
+				text: '1\\nTOGGLE',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_output_action',
+						options: {
+							outputNumber: 1,
+							outputState: 'outputToggle'
+						}
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
 	});
 }
