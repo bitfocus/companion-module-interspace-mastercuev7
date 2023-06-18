@@ -1,4 +1,3 @@
-
 const Regex = require('@companion-module/base')
 
 module.exports = {

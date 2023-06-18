@@ -1,5 +1,5 @@
-const { combineRgb } = require('@companion-module/base')
-const Fields = require('./fields')
+const Options = require('./options')
+const Styles = require('./styles')
 
 module.exports = async function (self) {
 	self.setFeedbackDefinitions({
@@ -7,43 +7,53 @@ module.exports = async function (self) {
 			type: 'advanced',
 			name: 'Acknowledge Cue',
 			description: 'Visual indication of Cue being received',
-			options: [Fields.CueType],
-			defaultStyle: {
-				bgcolor: combineRgb(100, 100, 100),
-				color: combineRgb(0, 0, 0),
-			},
+			options: [Options.CueType],
+			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
-				if(feedback.options == undefined) return;
+				if (feedback.options == undefined) return; // During init
 				var type = fetchedCueType;
 				if (type == 'forward') { type = 'next'; } //...
 				// This button isn't of cueType
 				if (feedback.options.cueType != type) {
-					return { bgcolor: combineRgb(100, 100, 100)};
+					return Styles.Default;
 				}
-				if (type == 'forward') {
-					return { bgcolor: combineRgb(0, 255, 0) };
+				if (type == 'next') {
+					if (outputsSuspended) {
+						return Styles.IdleNext;
+					}
+					return Styles.NextAck;
 				} else if (type == 'back') {
-					return { bgcolor: combineRgb(255, 0, 0) };
+					if (outputsSuspended) {
+						return Styles.IdleBack;
+					}
+					return Styles.BackAck;
 				} else if (type == 'black') {
-					return { bgcolor: combineRgb(0, 0, 0) };
+					if (!enableBlackout) {
+						return Styles.Default;
+					} 
+					else if (outputsSuspended) {
+						return Styles.IdleBlackout;
+					}
+					return Styles.BlackoutAck;
 				}
-				return { bgcolor: combineRgb(0, 100, 0)};
+				return Styles.Default;
 			}
 		},
-		Output_State: {
-			type: 'advanced', // Doesn't work with boolean
+		output_channel_feedback: {
+			type: 'advanced',
 			name: 'Output State',
 			description: 'Indicates current state of Outputs',
-			options: [Fields.Port],
-			defaultStyle: {
-				bgcolor: combineRgb(0, 0, 0),
-				color: combineRgb(0, 0, 0),
-			},
+			options: [Options.Port],
+			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
-				if (fetchedPortData[feedback.options.outputNumber-1]) {
-					return { bgcolor: combineRgb(100, 100, 100)};
+				if (fetchedPortData.length <= 0) return Styles.Default;
+				if (fetchedPortData[feedback.options.outputNumber-1][0]) { // isOn
+					if (fetchedPortData[feedback.options.outputNumber-1][1]) { // isConnected
+						return Styles.OutputOn;
+					}
+					return Styles.OutputOff;
 				} else {
-					return { bgcolor: combineRgb(0, 0, 0)};
+					return Styles.Default;
 				}
 			}
 		}

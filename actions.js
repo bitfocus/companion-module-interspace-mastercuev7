@@ -1,4 +1,4 @@
-const Fields = require('./fields')
+const Options = require('./options')
 
 module.exports = function (self) {
 
@@ -14,7 +14,7 @@ module.exports = function (self) {
 		send_cue_action: {
 			name: 'Send Cue',
 			description: 'Send specified Cue to configured device',
-			options: [Fields.CueType],
+			options: [Options.CueType],
 			callback: async(event) => {
 				await self.sendCommand({ 'command': 'cue', 'cueType': `${event.options.cueType}` });
 			}
@@ -22,17 +22,17 @@ module.exports = function (self) {
 		set_output_action: {
 			name: 'Set Output',
 			description: 'Set the State of an Output',
-			options: [Fields.Port, Fields.OutputState],
+			options: [Options.Port, Options.OutputState],
 			callback: async(event) => {
-				await self.sendCommand({ 'command': event.options.outputState, 'index': event.options.outputSingle-1 });
+				await self.sendCommand({ 'command': event.options.outputState, 'index': event.options.outputNumber-1 });
 			},
 		},
 		set_multi_output_action: {
 			name: 'Set Outputs',
 			description: 'Set the State of multiple Outputs',
-			options: [Fields.MultiPort, Fields.OutputState],
+			options: [Options.MultiPort, Options.OutputState],
 			callback: async(event) => {
-				for (const outputNumber of event.options.outputMulti) {
+				for (const outputNumber of event.options.outputNumbers) {
 					await self.sendCommand({ 'command': event.options.outputState, 'index': outputNumber-1});
 				}		
 			},

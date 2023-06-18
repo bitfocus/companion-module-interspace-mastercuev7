@@ -1,19 +1,18 @@
 const { InstanceBase, runEntrypoint, InstanceStatus } = require('@companion-module/base')
+const Options = require('./options')
 const UpgradeScripts = require('./upgrades')
-const Fields = require('./fields')
 const UpdatePresets = require('./presets')
 const UpdateActions = require('./actions')
 const UpdateFeedbacks = require('./feedbacks')
 const UpdateVariableDefinitions = require('./variables')
 
-const { combineRgb } = require('@companion-module/base')
-const DefaultGrey = combineRgb(100, 100, 100);
-const ColorBlack = combineRgb(0, 0, 0);
-
 fastTimer = 0;
 slowTimer = 0;
 fetchedCueType = '';
 fetchedPortData = [];
+
+outputsSuspended = false;
+//enableBlackout = false;
 
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
@@ -43,7 +42,7 @@ class ModuleInstance extends InstanceBase {
 
 	// Return config fields for web config
 	getConfigFields() {
-		return [Fields.UnitIP, Fields.UnitID]
+		return [Options.UnitIP, Options.UnitID]
 	}
 
 	updatePresets() {
@@ -55,7 +54,7 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	updateFeedbacks() {
-		UpdateFeedbacks(this)
+		UpdateFeedbacks(this);
 	}
 
 	updateVariableDefinitions() {
@@ -142,7 +141,6 @@ class ModuleInstance extends InstanceBase {
 						fetchedCueType = jsonResponse.type;
 					}
 				}
-				//console.log('GET request successful:', jsonResponse);
 			}
 			this.filterResponseLog(cueResponse);
 		} catch (error) {
@@ -168,17 +166,18 @@ class ModuleInstance extends InstanceBase {
 				const jsonResponse = await settingsResponse.json();
 				const outputChannels = jsonResponse.state.outputChannels;
 				fetchedPortData = [];
+				outputsSuspended = jsonResponse.state.outputsSuspended;
+				//enableBlackout = jsonResponse.settings.misc.enableBlack;
 				outputChannels.forEach((outputChannel, index) => {
 					//console.log(`Output Channel ${index + 1}: isOn: ${outputChannel.isOn}`);
-					fetchedPortData.push(outputChannel.isOn);
+					fetchedPortData.push([outputChannel.isOn, outputChannel.isConnected]);
 				});
-				//console.log('GET request successful:', jsonResponse);
 			}
 			this.filterResponseLog(settingsResponse);
 		} catch (error) {
 			this.filterErrorLog(error);
 		}
-		this.checkFeedbacks('Output_State');
+		this.checkFeedbacks('output_channel_feedback');
 	}
 }
 

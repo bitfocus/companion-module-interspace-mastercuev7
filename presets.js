@@ -1,4 +1,5 @@
 const { combineRgb } = require('@companion-module/base')
+const Styles = require('./styles')
 
 module.exports = async function (self) {
 	const ColorWhite = combineRgb(255, 255, 255)
@@ -10,12 +11,7 @@ module.exports = async function (self) {
 			type: 'button',
 			category: 'MasterCue',
 			name: 'Next Cue',
-			size: '14',
-			style: {
-				text: 'Next',
-				color: ColorWhite,
-				bgcolor: ColorGrey,
-			},
+			style: Styles.FullNext,
 			steps: [{
 					down: [{
 						actionId: 'send_cue_action',
@@ -36,12 +32,7 @@ module.exports = async function (self) {
 			type: 'button',
 			category: 'MasterCue',
 			name: 'Back Cue',
-			size: '14',
-			style: {
-				text: 'Back',
-				color: ColorWhite,
-				bgcolor: ColorGrey,
-			},
+			style: Styles.FullBack,
 			steps: [{
 					down: [{
 						actionId: 'send_cue_action',
@@ -62,12 +53,7 @@ module.exports = async function (self) {
 			type: 'button',
 			category: 'MasterCue',
 			name: 'Blackout Cue',
-			style: {
-				text: 'Blackout',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorGrey,
-			},
+			style: Styles.FullBlackout,
 			steps: [{
 					down: [{
 						actionId: 'send_cue_action',
@@ -104,7 +90,12 @@ module.exports = async function (self) {
 					}],
 					up: []
 			}],
-			feedbacks: []
+			feedbacks: [{
+				feedbackId: 'output_channel_feedback',
+				options: {
+					outputNumber: 1
+				}
+			}]
 		},
 		OutputDisable : {
 			type: 'button',
@@ -126,7 +117,12 @@ module.exports = async function (self) {
 					}],
 					up: []
 			}],
-			feedbacks: []
+			feedbacks: [{
+				feedbackId: 'output_channel_feedback',
+				options: {
+					outputNumber: 1
+				}
+			}]
 		},
 		OutputToggle : {
 			type: 'button',
@@ -145,6 +141,69 @@ module.exports = async function (self) {
 							outputNumber: 1,
 							outputState: 'outputToggle'
 						}
+					}],
+					up: []
+			}],
+			feedbacks: [{
+				feedbackId: 'output_channel_feedback',
+				options: {
+					outputNumber: 1
+				}
+			}]
+		},
+		OutputToggleMulti : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Output Toggle Multi',
+			style: {
+				text: 'Multi\\nTOGGLE',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_multi_output_action',
+						options: {
+							outputNumbers: [1],
+							outputState: 'outputToggle'
+						}
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
+		SuspendAll : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Suspend All',
+			style: {
+				text: 'Suspend All',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'suspend_action',
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
+		ResumeAll : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Resume All',
+			style: {
+				text: 'Resume All',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'resume_action',
 					}],
 					up: []
 			}],
