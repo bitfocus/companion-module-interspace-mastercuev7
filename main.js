@@ -8,28 +8,31 @@ const UpdateVariableDefinitions = require('./variables')
 
 fastTimer = 0;
 slowTimer = 0;
-fetchedCueType = '';
-fetchedPortData = [];
 
-outputsSuspended = false;
-//enableBlackout = false;
+deviceData = {
+	firstLoad: true,
+	fetchedCueType: '',
+
+	state: {},
+	settings: {}
+};
 
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
-		super(internal)
+		super(internal);
 	}
 
 	async init(config) {
-		this.config = config
+		this.config = config;
 		
-		this.updateActions() // export actions
-		this.updateFeedbacks() // export feedbacks
-		this.updateVariableDefinitions() // export variable definitions
+		this.updateActions();
+		this.updateFeedbacks();
+		this.updateVariableDefinitions();
 		this.updatePresets();
 
 		this.checkCues();
 		this.checkSettings();
-		this.updateStatus(InstanceStatus.Ok) // Updates Connection Status
+		this.updateStatus(InstanceStatus.Ok); // Updates Connection Status
 	}
 	// When module gets deleted
 	async destroy() {
@@ -37,12 +40,12 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	async configUpdated(config) {
-		this.config = config
+		this.config = config;
 	}
 
 	// Return config fields for web config
 	getConfigFields() {
-		return [Options.UnitIP, Options.UnitID]
+		return [Options.UnitIP, Options.UnitID];
 	}
 
 	updatePresets() {
@@ -50,7 +53,7 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	updateActions() {
-		UpdateActions(this)
+		UpdateActions(this);
 	}
 
 	updateFeedbacks() {
@@ -58,13 +61,13 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	updateVariableDefinitions() {
-		UpdateVariableDefinitions(this)
+		UpdateVariableDefinitions(this);
 	}
 
 	filterResponseLog(response) {
 		if (response.ok) return;
 		if (response.status == 404) {
-			console.error('Page not found');
+			console.error('V7 Not found : Check Connections config');
 		} else if (response.status == 500) {
 			console.error('Server error');
 		} else if (!response.ok) {
@@ -77,7 +80,11 @@ class ModuleInstance extends InstanceBase {
 	// See https://nodejs.org/api/errors.html#nodejs-error-codes
 	filterErrorLog(error) {
 		if (error.cause.code == 'UND_ERR_CONNECT_TIMEOUT') {
-			console.error('Connection timeout (Check IP config)');
+			console.error('Connection timeout : Check Connections config');
+		} else if (error.cause.code == 'ERR_INVALID_URL') {
+			console.error('Invalid IP : Check Connections config');
+		} else if (error.cause.code == 'ECONNABORTED') {
+			console.error('Connection aborted : Check hardware setup');
 		} else {
 			console.log(error.cause);
 		}
@@ -95,8 +102,12 @@ class ModuleInstance extends InstanceBase {
     	slowTimer = setTimeout(() => { this.checkSettings(); }, 2000);
 	}
 
-	async sendCommand(body)
-	{
+	immediateCheckSettings() {
+		clearTimeout(slowTimer);
+		slowTimer = setTimeout(() => { this.checkSettings(); }, 50);
+	}
+
+	async sendCommand(body) {
 		let url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
 		console.log(`Sending command to ${url}:`, body);
 		try {
@@ -109,7 +120,7 @@ class ModuleInstance extends InstanceBase {
 			});
 
 			if (commandResponse.ok) {
-				fetchedCueType = body['cueType'];
+				deviceData.fetchedCueType = body['cueType'];
 			}
 			this.filterResponseLog(commandResponse);
 		} catch (error) {
@@ -118,9 +129,8 @@ class ModuleInstance extends InstanceBase {
 		this.checkFeedbacks('ack_cue_feedback');
 	}
 
-	async fetchCues(body)
-	{
-		fetchedCueType = '';
+	async fetchCues(body) {
+		deviceData.fetchedCueType = '';
 		let url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
 		console.log(`Fetching cues from ${url}`);
 		try {
@@ -138,7 +148,7 @@ class ModuleInstance extends InstanceBase {
 				if (cueAge < 1500) {
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at;
-						fetchedCueType = jsonResponse.type;
+						deviceData.fetchedCueType = jsonResponse.type;
 					}
 				}
 			}
@@ -149,9 +159,7 @@ class ModuleInstance extends InstanceBase {
 		this.checkFeedbacks('ack_cue_feedback');
 	}
 
-	async fetchSettings(body)
-	{
-		fetchedCueType = '';
+	async fetchSettings(body) {
 		let url = `http://${this.config.unitIP}/settings/${this.config.unitId}`;
 		console.log(`Fetching settings from ${url}`);
 		try {
@@ -164,20 +172,18 @@ class ModuleInstance extends InstanceBase {
 	
 			if (settingsResponse.ok) {
 				const jsonResponse = await settingsResponse.json();
-				const outputChannels = jsonResponse.state.outputChannels;
-				fetchedPortData = [];
-				outputsSuspended = jsonResponse.state.outputsSuspended;
-				//enableBlackout = jsonResponse.settings.misc.enableBlack;
-				outputChannels.forEach((outputChannel, index) => {
-					//console.log(`Output Channel ${index + 1}: isOn: ${outputChannel.isOn}`);
-					fetchedPortData.push([outputChannel.isOn, outputChannel.isConnected]);
-				});
+				deviceData.state = jsonResponse.state;
+				deviceData.settings = jsonResponse.settings;
+				deviceData.firstLoad = false;
 			}
 			this.filterResponseLog(settingsResponse);
 		} catch (error) {
 			this.filterErrorLog(error);
 		}
 		this.checkFeedbacks('output_channel_feedback');
+		this.checkFeedbacks('next_feedback');
+		this.checkFeedbacks('back_feedback');
+		this.checkFeedbacks('blackout_feedback');
 	}
 }
 

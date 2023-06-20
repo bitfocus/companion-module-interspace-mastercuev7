@@ -3,14 +3,26 @@
 	"name": "interspace-mastercuev7",
 	"shortname": "MasterCueV7",
 	"description": "Integration with Interspace Industries MasterCue V7",
+	"manufacturer": "Interspace Industries",
+	"products": ["MasterCue V7"],
+	"keywords": ["MasterCue","Cue","V7","Interspace"],
 	"version": "1.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/bitfocus/companion-module-your-module-name.git",
-	"bugs": "https://github.com/bitfocus/companion-module-your-module-name/issues",
+	"repository": "git+https://github.com/willdean/companion-module-Interspace-MasterCueV7.git",
+	"bugs": "https://github.com/willdean/companion-module-Interspace-MasterCueV7/issues",
 	"maintainers": [
 		{
-			"name": "Dave Humphrys",
+			"name": "Luc Heaton",
+			"email": "luc@lucHeaton.com",
+			"github": "https://github.com/Luuccc"
+		},
+		{
+			"name": "Interspace Industries",
 			"email": "moreinfo@interspaceind.com"
+		},
+		{
+			"name": "Will Dean",
+			"github": "https://github.com/willdean"
 		}
 	],
 	"runtime": {
@@ -19,8 +31,5 @@
 		"apiVersion": "0.0.0",
 		"entrypoint": "../main.js"
 	},
-	"legacyIds": [],
-	"manufacturer": "Interspace Industries",
-	"products": ["MasterCue V7"],
-	"keywords": []
+	"legacyIds": []
 }

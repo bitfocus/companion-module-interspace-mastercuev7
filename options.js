@@ -19,7 +19,7 @@ module.exports = {
 		default: '001-123-456',
 	},
 
-	Port: {
+	Output: {
 		id: 'outputNumber',
 		type: 'number',
 		label: 'Output Number',
@@ -28,7 +28,7 @@ module.exports = {
 		default: 1,
 	},
 
-	MultiPort: {
+	MultiOutput: {
 		id: 'outputNumbers',
 		type: 'multidropdown',
 		label: 'Output Numbers',
@@ -54,6 +54,13 @@ module.exports = {
 			{ id: 'outputToggle', label: 'Toggle' },
 		],
 		default: 'outputOn',
+	},
+
+	EnableBlackout: {
+		id: 'enableBlackout',
+		type: 'checkbox',
+		label: 'Enable Blackout',
+		default: true,
 	},
 
 	CueType: {
