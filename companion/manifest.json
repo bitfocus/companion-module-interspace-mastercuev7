@@ -8,8 +8,8 @@
 	"keywords": ["MasterCue","Cue","V7","Interspace"],
 	"version": "1.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/willdean/companion-module-Interspace-MasterCueV7.git",
-	"bugs": "https://github.com/willdean/companion-module-Interspace-MasterCueV7/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-interspace-mastercuev7",
+	"bugs": "https://github.com/bitfocus/companion-module-interspace-mastercuev7/issues",
 	"maintainers": [
 		{
 			"name": "Luc Heaton",

@@ -8,7 +8,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/willdean/companion-module-Interspace-MasterCueV7.git"
+		"url": "git+https://github.com/bitfocus/companion-module-interspace-mastercuev7.git"
 	},
 	"dependencies": {
 		"@companion-module/base": "~1.4.0"
