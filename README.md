@@ -1,6 +1,12 @@
 ## Interspace Industries MasterCue V7
 
-Will allow you to control a MasterCue V7 over a network.
+This module will allow you to control a MasterCue V7 over a network.
+
+After configuring the MasterCueV7 Connection, you have several options to customize its functionality. You can:
+
+- Create your desired functionality from scratch.
+- Utilize our provided Presets.
+- Build upon the example page layout (`.companionconfig`) available for download from [GitHub](https://github.com/bitfocus/companion-module-interspace-mastercuev7), which can be imported into Companion.
 
 **Available module actions:**
 
