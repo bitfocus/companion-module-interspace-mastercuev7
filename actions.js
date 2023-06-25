@@ -7,7 +7,7 @@ module.exports = function(self) {
 			description: 'Send Cue to configured device',
 			options: [Options.CueType],
 			callback: async(event) => {
-				if (event.options.cueType == 'black' && !deviceData.settings.misc.enableBlack) return; // Yuck
+				if (event.options.cueType == 'black' && !self.deviceData.settings.misc.enableBlack) return; // Yuck
 				await self.sendCommand({ 'command': 'cue', 'cueType': `${event.options.cueType}` });
 				self.immediateCheckSettings();
 			}
@@ -37,8 +37,8 @@ module.exports = function(self) {
 			description: 'Enable/Disable Blackout',
 			options: [Options.EnableBlackout],
 			callback: async(event) => {
-				deviceData.settings.misc.enableBlack = event.options.enableBlackout;
-				await self.sendCommand({ 'command': 'settings', 'settings': deviceData.settings});
+				self.deviceData.settings.misc.enableBlack = event.options.enableBlackout;
+				await self.sendCommand({ 'command': 'settings', 'settings': self.deviceData.settings});
 				self.immediateCheckSettings();
 			},
 		},

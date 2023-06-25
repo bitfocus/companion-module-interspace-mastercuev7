@@ -8,11 +8,10 @@ module.exports = async function(self) {
 			name: 'Output State',
 			description: 'Indicates current state of an Output',
 			options: [Options.Output],
-			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
 				// V7 data unavailable
-				if (deviceData.firstLoad || deviceData.state == undefined) return;
-				var fetchedPortData = deviceData.state.outputChannels;
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
+				var fetchedPortData = self.deviceData.state.outputChannels;
 				if (fetchedPortData[feedback.options.outputNumber-1].isOn) {
 					if (fetchedPortData[feedback.options.outputNumber-1].isConnected) {
 						return Styles.OutputOn;
@@ -28,11 +27,10 @@ module.exports = async function(self) {
 			name: 'Next State',
 			description: 'Indicates state of Next Cue',
 			options: [],
-			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
 				// V7 data unavailable
-				if (deviceData.firstLoad || deviceData.state == undefined) return;
-				if (deviceData.state.outputsSuspended) {
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
+				if (self.deviceData.state.outputsSuspended) {
 					return Styles.IdleNext;
 				}
 				return Styles.FullNext;
@@ -43,11 +41,10 @@ module.exports = async function(self) {
 			name: 'Back State',
 			description: 'Indicates state of Back Cue',
 			options: [],
-			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
 				// V7 data unavailable
-				if (deviceData.firstLoad || deviceData.state == undefined) return;
-				if (deviceData.state.outputsSuspended) {
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
+				if (self.deviceData.state.outputsSuspended) {
 					return Styles.IdleBack;
 				}
 				return Styles.FullBack;
@@ -58,11 +55,10 @@ module.exports = async function(self) {
 			name: 'Blackout State',
 			description: 'Indicates state of Blackout Cue',
 			options: [],
-			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
 				// V7 data unavailable
-				if (deviceData.firstLoad || deviceData.state == undefined) return;
-				if (!deviceData.settings.misc.enableBlack) {
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
+				if (!self.deviceData.settings.misc.enableBlack) {
 					return Styles.IdleBlackout;
 				}
 				return Styles.FullBlackout;
@@ -73,10 +69,9 @@ module.exports = async function(self) {
 			name: 'Acknowledge Cue',
 			description: 'Indicates Cue being received (Last Feedback step)',
 			options: [Options.CueType],
-			defaultStyle: Styles.Default,
 			callback: async (feedback) => {
-				if (deviceData.firstLoad) return; // Haven't got V7 data yet
-				var _type = deviceData.fetchedCueType;
+				if (self.deviceData.firstLoad) return; // Haven't got V7 data yet
+				var _type = self.deviceData.fetchedCueType;
 				if (_type == 'forward') _type = 'next'; //...
 				// This button isn't of cueType
 				if (feedback.options.cueType != _type) {

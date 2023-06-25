@@ -6,18 +6,19 @@ const UpdateActions = require('./actions')
 const UpdateFeedbacks = require('./feedbacks')
 const UpdateVariableDefinitions = require('./variables')
 
-fastTimer = 0;
-slowTimer = 0;
-
-deviceData = {
-	firstLoad: true,
-	fetchedCueType: '',
-
-	state: {},
-	settings: {}
-};
-
 class ModuleInstance extends InstanceBase {
+
+	fastTimer = 0;
+	slowTimer = 0;
+
+	deviceData = {
+		firstLoad: true,
+		fetchedCueType: '',
+
+		state: {},
+		settings: {}
+	};
+
 	constructor(internal) {
 		super(internal);
 	}
@@ -91,20 +92,20 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	checkCues() {
-		clearTimeout(fastTimer);
+		clearTimeout(this.fastTimer);
 		this.fetchCues();
-    	fastTimer = setTimeout(() => { this.checkCues(); }, 500);
+    	this.fastTimer = setTimeout(() => { this.checkCues(); }, 500);
 	}
 
 	checkSettings() {
-		clearTimeout(slowTimer);
+		clearTimeout(this.slowTimer);
 		this.fetchSettings();
-    	slowTimer = setTimeout(() => { this.checkSettings(); }, 2000);
+    	this.slowTimer = setTimeout(() => { this.checkSettings(); }, 2000);
 	}
 
 	immediateCheckSettings() {
-		clearTimeout(slowTimer);
-		slowTimer = setTimeout(() => { this.checkSettings(); }, 50);
+		clearTimeout(this.slowTimer);
+		this.slowTimer = setTimeout(() => { this.checkSettings(); }, 50);
 	}
 
 	async sendCommand(body) {
@@ -120,7 +121,7 @@ class ModuleInstance extends InstanceBase {
 			});
 
 			if (commandResponse.ok) {
-				deviceData.fetchedCueType = body['cueType'];
+				this.deviceData.fetchedCueType = body['cueType'];
 			}
 			this.filterResponseLog(commandResponse);
 		} catch (error) {
@@ -130,7 +131,7 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	async fetchCues(body) {
-		deviceData.fetchedCueType = '';
+		this.deviceData.fetchedCueType = '';
 		let url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
 		console.log(`Fetching cues from ${url}`);
 		try {
@@ -148,7 +149,7 @@ class ModuleInstance extends InstanceBase {
 				if (cueAge < 1500) {
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at;
-						deviceData.fetchedCueType = jsonResponse.type;
+						this.deviceData.fetchedCueType = jsonResponse.type;
 					}
 				}
 			}
@@ -172,18 +173,18 @@ class ModuleInstance extends InstanceBase {
 	
 			if (settingsResponse.ok) {
 				const jsonResponse = await settingsResponse.json();
-				deviceData.state = jsonResponse.state;
-				deviceData.settings = jsonResponse.settings;
-				deviceData.firstLoad = false;
+				this.deviceData.state = jsonResponse.state;
+				this.deviceData.settings = jsonResponse.settings;
+				this.deviceData.firstLoad = false;
 			}
 			this.filterResponseLog(settingsResponse);
 		} catch (error) {
 			this.filterErrorLog(error);
 		}
-		this.checkFeedbacks('output_channel_feedback');
-		this.checkFeedbacks('next_feedback');
-		this.checkFeedbacks('back_feedback');
-		this.checkFeedbacks('blackout_feedback');
+		this.checkFeedbacks('output_channel_feedback', 
+							'next_feedback', 
+							'back_feedback', 
+							'blackout_feedback');
 	}
 }
 
