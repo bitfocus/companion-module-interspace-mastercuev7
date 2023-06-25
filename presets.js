@@ -169,9 +169,6 @@ module.exports = async function (self) {
 				}
 			}]
 		},
-
-
-
 		NextCue : {
 			type: 'button',
 			category: 'MasterCue',
@@ -195,7 +192,6 @@ module.exports = async function (self) {
 					}
 			}]
 		},
-
 		ClearHandsets : {
 			type: 'button',
 			category: 'MasterCue',
@@ -214,12 +210,6 @@ module.exports = async function (self) {
 			}],
 			feedbacks: []
 		},
-
-
-
-
-
-
 
 
 		OutputDisable1 : {
@@ -384,8 +374,6 @@ module.exports = async function (self) {
 				}
 			}]
 		},
-
-
 		BackCue : {
 			type: 'button',
 			category: 'MasterCue',
@@ -409,8 +397,6 @@ module.exports = async function (self) {
 					}
 			}]
 		},
-
-		
 		ResumeAll : {
 			type: 'button',
 			category: 'MasterCue',
@@ -429,7 +415,6 @@ module.exports = async function (self) {
 			}],
 			feedbacks: []
 		},
-
 
 
 		OutputToggle1 : {
@@ -594,9 +579,6 @@ module.exports = async function (self) {
 				}
 			}]
 		},
-
-
-		
 		BlackoutCue : {
 			type: 'button',
 			category: 'MasterCue',
@@ -620,7 +602,6 @@ module.exports = async function (self) {
 					}
 			}]
 		},
-
 		SuspendAll : {
 			type: 'button',
 			category: 'MasterCue',
@@ -639,8 +620,6 @@ module.exports = async function (self) {
 			}],
 			feedbacks: []
 		},
-
-
 
 
 		OutputToggleMulti : {
@@ -665,7 +644,6 @@ module.exports = async function (self) {
 			}],
 			feedbacks: []
 		},
-		
 		EnableBlackout : {
 			type: 'button',
 			category: 'MasterCue',
