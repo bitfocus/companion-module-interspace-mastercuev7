@@ -63,6 +63,13 @@ module.exports = {
 		default: true,
 	},
 
+	TechnicianMode: {
+		id: 'enableFullCues',
+		type: 'checkbox',
+		label: 'Enable Full Cues',
+		default: true,
+	},
+
 	CueType: {
 		id: 'cueType',
 		type: 'dropdown',

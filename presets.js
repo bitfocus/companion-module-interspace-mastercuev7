@@ -686,5 +686,62 @@ module.exports = async function (self) {
 			}],
 			feedbacks: []
 		},
+		TMFull : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Set Full Cues',
+			style: {
+				text: 'Set Full Cues',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_tm_action',
+						options: {
+							enableFullCues: true,
+						}
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
+		TMLampOnly : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Set Lamp Only',
+			style: {
+				text: 'Set Lamp Only',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_tm_action',
+						options: {
+							enableFullCues: false,
+						}
+					}],
+					up: []
+			}],
+			feedbacks: []
+		},
+		TMIndicator : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'TM Indicator',
+			style: {
+				text: 'Cues: ',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [],
+			feedbacks: [{
+				feedbackId: 'technician_feedback',
+			}]
+		},
 	});
 }

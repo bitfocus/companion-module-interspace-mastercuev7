@@ -64,6 +64,20 @@ module.exports = async function(self) {
 				return Styles.FullBlackout;
 			}
 		},
+		technician_feedback: {
+			type: 'advanced',
+			name: 'TM State',
+			description: 'Indicates state of Technician Mode',
+			options: [],
+			callback: async (feedback) => {
+				// V7 data unavailable
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
+				if (self.deviceData.settings.misc.cueLightOnly) {
+					return Styles.LampOnly;
+				}
+				return Styles.FullCues;
+			}
+		},
 		ack_cue_feedback: {
 			type: 'advanced',
 			name: 'Acknowledge Cue',

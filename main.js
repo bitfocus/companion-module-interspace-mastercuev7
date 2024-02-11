@@ -80,14 +80,18 @@ class ModuleInstance extends InstanceBase {
 
 	// See https://nodejs.org/api/errors.html#nodejs-error-codes
 	filterErrorLog(error) {
-		if (error.cause.code == 'UND_ERR_CONNECT_TIMEOUT') {
-			console.error('Connection timeout : Check Connections config');
-		} else if (error.cause.code == 'ERR_INVALID_URL') {
-			console.error('Invalid IP : Check Connections config');
-		} else if (error.cause.code == 'ECONNABORTED') {
-			console.error('Connection aborted : Check hardware setup');
-		} else {
-			console.log(error.cause);
+		try {
+			if (error.cause.code == 'UND_ERR_CONNECT_TIMEOUT') {
+				console.error('Connection timeout : Check Connections config');
+			} else if (error.cause.code == 'ERR_INVALID_URL') {
+				console.error('Invalid IP : Check Connections config');
+			} else if (error.cause.code == 'ECONNABORTED') {
+				console.error('Connection aborted : Check hardware setup');
+			} else {
+				console.error(error);
+			}
+		} catch {
+			console.error(error);
 		}
 	}
 
@@ -184,7 +188,8 @@ class ModuleInstance extends InstanceBase {
 		this.checkFeedbacks('output_channel_feedback', 
 							'next_feedback', 
 							'back_feedback', 
-							'blackout_feedback');
+							'blackout_feedback',
+							'technician_feedback');
 	}
 }
 

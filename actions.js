@@ -42,6 +42,16 @@ module.exports = function(self) {
 				self.immediateCheckSettings();
 			},
 		},
+		set_tm_action: {
+			name: 'Set Technician Mode',
+			description: 'Set Cues to Full or Lights Only',
+			options: [Options.TechnicianMode],
+			callback: async(event) => {
+				self.deviceData.settings.misc.cueLightOnly = !event.options.enableFullCues;
+				await self.sendCommand({ 'command': 'settings', 'settings': self.deviceData.settings});
+				self.immediateCheckSettings();
+			},
+		},
 		suspend_action: {
 			name: 'Suspend All',
 			description: 'Suspends all Outputs',
