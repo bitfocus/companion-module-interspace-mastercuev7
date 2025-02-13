@@ -19,6 +19,15 @@ module.exports = {
 		default: '001-123-456',
 	},
 
+	HandsetID: {
+		id: 'handsetId',
+		type: 'textinput',
+		label: 'Handset ID',
+		width: 8,
+		regex: "/^[0-9]+\\-[0-9]+\\-[0-9]+$/",
+		default: '00-123-456',
+	},
+
 	Output: {
 		id: 'outputNumber',
 		type: 'number',
@@ -40,6 +49,32 @@ module.exports = {
 			{ id: '4', label: 'Output 4' },
 			{ id: '5', label: 'Output 5' },
 			{ id: '6', label: 'Output 6' }
+		],
+		default: '1',
+	},
+
+	HandsetLabel: {
+		id: 'handsetLabel',
+		type: 'textinput',
+		label: 'Handset Label',
+		tooltip: 'Optional text label, which will be displayed on the screen of the V7 when a cue is active',
+		width: 8,
+		regex: "^[\w.-]+$",
+		default: 'Alice',
+	},
+
+	OutputMask: {
+		id: 'outputMask',
+		type: 'multidropdown',
+		label: 'Output Mask',
+		tooltip: 'Which USB ports to direct cues to?',
+		choices: [
+			{ id: '1', label: 'Port 1' },
+			{ id: '2', label: 'Port 2' },
+			{ id: '4', label: 'Port 3' },
+			{ id: '8', label: 'Port 4' },
+			{ id: '16', label: 'Port 5' },
+			{ id: '32', label: 'Port 6' }
 		],
 		default: '1',
 	},

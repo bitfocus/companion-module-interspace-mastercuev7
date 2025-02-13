@@ -112,6 +112,14 @@ class ModuleInstance extends InstanceBase {
 		this.slowTimer = setTimeout(() => { this.checkSettings(); }, 50);
 	}
 
+	getOutputMask(portMask) {
+		let sum = 0;
+		for (const portNum of portMask) {
+			sum += parseInt(portNum, 10);
+		}	
+		return sum;
+	}
+
 	async sendCommand(body) {
 		let url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
 		console.log(`Sending command to ${url}:`, body);

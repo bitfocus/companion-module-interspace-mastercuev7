@@ -80,6 +80,18 @@ module.exports = function(self) {
 				self.immediateCheckSettings();
 			},
 		},
+		set_handset_action: {
+			name: 'Set Handset',
+			description: 'Updates V7\'s knowledge of a Handset',
+			options: [Options.HandsetID, Options.HandsetLabel, Options.OutputMask],
+			callback: async(event) => {
+				const handset =  {'id' : event.options.handsetId, 
+								  'label' : event.options.handsetLabel,
+								  'outputMask' :  self.getOutputMask(event.options.outputMask)};
+				await self.sendCommand({ 'command': 'setHandsets', 'handsets': handset});
+				self.immediateCheckSettings();
+			},
+		},
 		factory_reset_action: {
 			name: 'Factory Reset',
 			description: 'Resets all V7 settings to default',
