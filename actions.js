@@ -80,15 +80,18 @@ module.exports = function(self) {
 				self.immediateCheckSettings();
 			},
 		},
-		set_handset_action: {
-			name: 'Set Handset',
-			description: 'Updates V7\'s knowledge of a Handset',
+		configure_handset_action: {
+			name: 'Configure Handset',
+			description: 'Configures a specified Handset',
 			options: [Options.HandsetID, Options.HandsetLabel, Options.OutputMask],
 			callback: async(event) => {
-				const handset =  {'id' : event.options.handsetId, 
-								  'label' : event.options.handsetLabel,
-								  'outputMask' :  self.getOutputMask(event.options.outputMask)};
-				await self.sendCommand({ 'command': 'setHandsets', 'handsets': handset});
+				// Update handsets property of settings
+				self.updateHandsetData(self.deviceData.settings.handsets,
+					event.options.handsetId,
+					event.options.handsetLabel,
+					self.getOutputMask(event.options.outputMask)
+				);
+				await self.sendCommand({ 'command': 'settings', 'settings': self.deviceData.settings});
 				self.immediateCheckSettings();
 			},
 		},

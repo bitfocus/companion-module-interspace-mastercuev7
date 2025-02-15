@@ -1,5 +1,6 @@
 const { combineRgb } = require('@companion-module/base')
-const Styles = require('./styles')
+const Styles = require('./styles');
+const { HandsetID } = require('./options');
 
 module.exports = async function (self) {
 	const ColorWhite = combineRgb(255, 255, 255)
@@ -742,6 +743,29 @@ module.exports = async function (self) {
 			feedbacks: [{
 				feedbackId: 'technician_feedback',
 			}]
+		},
+		ConfigureHandset : {
+			type: 'button',
+			category: 'MasterCue',
+			name: 'Configure Handset',
+			style: {
+				text: 'Configure Handset',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+				down: [{
+					actionId: 'configure_handset_action',
+					options: {
+						handsetId: '00-123-456',
+						handsetLabel: 'Alice',
+						outputMask: [1,2,4,8,16,32]
+					}
+				}],
+				up: []
+			}],
+			feedbacks: []
 		},
 	});
 }

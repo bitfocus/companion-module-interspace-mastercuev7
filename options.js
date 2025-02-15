@@ -66,7 +66,7 @@ module.exports = {
 	OutputMask: {
 		id: 'outputMask',
 		type: 'multidropdown',
-		label: 'Output Mask',
+		label: 'Enabled Ports',
 		tooltip: 'Which USB ports to direct cues to?',
 		choices: [
 			{ id: '1', label: 'Port 1' },

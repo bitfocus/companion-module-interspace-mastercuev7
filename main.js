@@ -1,4 +1,5 @@
 const { InstanceBase, runEntrypoint, InstanceStatus } = require('@companion-module/base')
+const Axios = require('axios')
 const Options = require('./options')
 const UpgradeScripts = require('./upgrades')
 const UpdatePresets = require('./presets')
@@ -19,12 +20,12 @@ class ModuleInstance extends InstanceBase {
 		settings: {}
 	};
 
-	constructor(internal) {
-		super(internal);
+	constructor(_internal) {
+		super(_internal);
 	}
 
-	async init(config) {
-		this.config = config;
+	async init(_config) {
+		this.config = _config;
 		
 		this.updateActions();
 		this.updateFeedbacks();
@@ -40,8 +41,8 @@ class ModuleInstance extends InstanceBase {
 		console.log('Destroy');
 	}
 
-	async configUpdated(config) {
-		this.config = config;
+	async configUpdated(_config) {
+		this.config = _config;
 	}
 
 	// Return config fields for web config
@@ -65,33 +66,40 @@ class ModuleInstance extends InstanceBase {
 		UpdateVariableDefinitions(this);
 	}
 
-	filterResponseLog(response) {
-		if (response.ok) return;
-		if (response.status == 404) {
-			console.error('V7 Not found : Check Connections config');
-		} else if (response.status == 500) {
+	filterResponseLog(_response) {
+		if (_response.status === 200) return;
+		if (_response.status === 404) {
+			console.error('V7 Not found: Check Connections config');
+		} else if (_response.status === 500) {
 			console.error('Server error');
-		} else if (!response.ok) {
-			console.error(`HTTP error! status: ${response.status}`);
 		} else {
-			console.error(`Error in request: ${response}`);
+			console.error(`HTTP error! status: ${_response.status}`);
 		}
 	}
 
-	// See https://nodejs.org/api/errors.html#nodejs-error-codes
-	filterErrorLog(error) {
-		try {
-			if (error.cause.code == 'UND_ERR_CONNECT_TIMEOUT') {
-				console.error('Connection timeout : Check Connections config');
-			} else if (error.cause.code == 'ERR_INVALID_URL') {
-				console.error('Invalid IP : Check Connections config');
-			} else if (error.cause.code == 'ECONNABORTED') {
-				console.error('Connection aborted : Check hardware setup');
+	filterErrorLog(_error) {
+		if (_error.response) {
+			// Server responded with a status code outside the 2xx range
+			console.error(`HTTP error! status: ${_error.response.status}`);
+			if (_error.response.status === 404) {
+				console.error('V7 Not found: Check Connections config');
+			} else if (_error.response.status === 500) {
+				console.error('Server error');
 			} else {
-				console.error(error);
+				console.error(`Unexpected status code: ${_error.response.status}`);
 			}
-		} catch {
-			console.error(error);
+		} else if (_error.request) {
+			// No response received, something went wrong with the request
+			if (_error.code === 'ECONNABORTED') {
+				console.error('Connection aborted: Check hardware setup');
+			} else if (_error.code === 'ERR_INVALID_URL') {
+				console.error('Invalid IP: Check Connections config');
+			} else {
+				console.error(`Network error: ${_error.message}`);
+			}
+		} else {
+			// Something else happened
+			console.error(`Error: ${_error.message}`);
 		}
 	}
 
@@ -112,86 +120,100 @@ class ModuleInstance extends InstanceBase {
 		this.slowTimer = setTimeout(() => { this.checkSettings(); }, 50);
 	}
 
-	getOutputMask(portMask) {
-		let sum = 0;
-		for (const portNum of portMask) {
-			sum += parseInt(portNum, 10);
+	getOutputMask(_portMask) {
+		let _sum = 0;
+		for (const _portNum of _portMask) {
+			_sum += parseInt(_portNum, 10);
 		}	
-		return sum;
+		return _sum;
 	}
 
-	async sendCommand(body) {
-		let url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
-		console.log(`Sending command to ${url}:`, body);
+	updateHandsetData(_handsetData, _id, _label, _outputMask) {
+		const _index = _handsetData.findIndex(_item => _item.id === _id);
+		if (_index !== -1) {
+			_handsetData[_index].label = _label;
+			_handsetData[_index].outputMask = _outputMask;
+		} else {
+			console.error(`Handset with id ${_id} is not registered to V7`);
+		}
+	}
+
+	async sendCommand(_body) {
+		let _url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
+		console.log(`Sending command to ${_url}:`, _body);
 		try {
-			const commandResponse = await fetch(url, {
-				method: 'POST',
+			const _commandResponse = await Axios.post(_url, _body, {
 				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(body),
+					'Content-Type': 'application/json'
+				}
 			});
 
-			if (commandResponse.ok) {
-				this.deviceData.fetchedCueType = body['cueType'];
+			// Axios returns a response with a status field.
+			if (_commandResponse.status === 200) {
+				this.deviceData.fetchedCueType = _body['cueType'];
 			}
-			this.filterResponseLog(commandResponse);
-		} catch (error) {
-			this.filterErrorLog(error);
+
+			// Filter 2xx responses
+			this.filterResponseLog(_commandResponse);
+		} catch (_error) {
+			this.filterErrorLog(_error);
 		}
 		this.checkFeedbacks('ack_cue_feedback');
 	}
 
-	async fetchCues(body) {
+	async fetchCues(_body) {
 		this.deviceData.fetchedCueType = '';
-		let url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
-		console.log(`Fetching cues from ${url}`);
+		let _url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
+		console.log(`Fetching cues from ${_url}`);
 		try {
-			const cueResponse = await fetch(url, {
-				method: 'GET',
+			const _cueResponse = await Axios.get(_url, {
 				headers: {
 					'Content-Type': 'application/json',
 				}
 			});
-	
-			if (cueResponse.ok) {
-				const jsonResponse = await cueResponse.json();
-				let cueAge = jsonResponse.now - jsonResponse.at;
+			
+			// Axios automatically throws for non-2xx status codes, so this is only reached for 2xx
+			if (_cueResponse.status === 200) {
+				const jsonResponse = _cueResponse.data;
+				let _cueAge = jsonResponse.now - jsonResponse.at;
+
 				// We've had a cue recently
-				if (cueAge < 1500) {
+				if (_cueAge < 1500) {
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at;
 						this.deviceData.fetchedCueType = jsonResponse.type;
 					}
 				}
 			}
-			this.filterResponseLog(cueResponse);
-		} catch (error) {
-			this.filterErrorLog(error);
+			
+			// Filter 2xx responses
+			this.filterResponseLog(_cueResponse);
+		} catch (_error) {
+			this.filterErrorLog(_error);
 		}
 		this.checkFeedbacks('ack_cue_feedback');
 	}
 
-	async fetchSettings(body) {
-		let url = `http://${this.config.unitIP}/settings/${this.config.unitId}`;
-		console.log(`Fetching settings from ${url}`);
+	async fetchSettings(_body) {
+		let _url = `http://${this.config.unitIP}/settings/${this.config.unitId}`;
+		console.log(`Fetching settings from ${_url}`);
 		try {
-			const settingsResponse = await fetch(url, {
-				method: 'GET',
+			const _settingsResponse = await Axios.get(_url, {
 				headers: {
 					'Content-Type': 'application/json',
 				}
 			});
-	
-			if (settingsResponse.ok) {
-				const jsonResponse = await settingsResponse.json();
-				this.deviceData.state = jsonResponse.state;
-				this.deviceData.settings = jsonResponse.settings;
+
+			// Axios automatically throws for non-2xx status codes, so this is only reached for 2xx
+			if (_settingsResponse.status === 200) {
+				const _jsonResponse = _settingsResponse.data;
+				this.deviceData.state = _jsonResponse.state;
+				this.deviceData.settings = _jsonResponse.settings;
 				this.deviceData.firstLoad = false;
 			}
-			this.filterResponseLog(settingsResponse);
-		} catch (error) {
-			this.filterErrorLog(error);
+			this.filterResponseLog(_settingsResponse);
+		} catch (_error) {
+			this.filterErrorLog(_error);
 		}
 		this.checkFeedbacks('output_channel_feedback', 
 							'next_feedback', 
