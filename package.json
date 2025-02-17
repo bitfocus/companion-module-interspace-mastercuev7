@@ -11,7 +11,7 @@
 		"url": "git+https://github.com/bitfocus/companion-module-interspace-mastercuev7.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.4.0",
+		"@companion-module/base": "~1.4.3",
 		"axios": "^1.7.4"
 	},
 	"devDependencies": {
