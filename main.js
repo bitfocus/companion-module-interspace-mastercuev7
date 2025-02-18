@@ -66,20 +66,9 @@ class ModuleInstance extends InstanceBase {
 		UpdateVariableDefinitions(this);
 	}
 
-	filterResponseLog(_response) {
-		if (_response.status === 200) return;
-		if (_response.status === 404) {
-			console.error('V7 Not found: Check Connections config');
-		} else if (_response.status === 500) {
-			console.error('Server error');
-		} else {
-			console.error(`HTTP error! status: ${_response.status}`);
-		}
-	}
-
+	// Server responded with a status code outside the 2xx range
 	filterErrorLog(_error) {
 		if (_error.response) {
-			// Server responded with a status code outside the 2xx range
 			console.error(`HTTP error! status: ${_error.response.status}`);
 			if (_error.response.status === 404) {
 				console.error('V7 Not found: Check Connections config');
@@ -115,6 +104,14 @@ class ModuleInstance extends InstanceBase {
     	this.slowTimer = setTimeout(() => { this.checkSettings(); }, 2000);
 	}
 
+	// Updated when a new Cue Type has been received by the V7
+	// Triggers On variable change Event
+	UpdateFetchedCueVariable() {
+		this.setVariableValues({
+			'LastCueType': this.deviceData.fetchedCueType 
+		});
+	}
+
 	immediateCheckSettings() {
 		clearTimeout(this.slowTimer);
 		this.slowTimer = setTimeout(() => { this.checkSettings(); }, 50);
@@ -129,9 +126,14 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	updateHandsetData(_handsetData, _id, _label, _outputMask) {
+		// Resolves findIndex error when param is undefined
+		if (_id !== undefined) return;
 		const _index = _handsetData.findIndex(_item => _item.id === _id);
 		if (_index !== -1) {
-			_handsetData[_index].label = _label;
+			// Only overwrite label if Configure Action has label with content not (undefined/null/empty)
+			if (_label) {
+				_handsetData[_index].label = _label;
+			}
 			_handsetData[_index].outputMask = _outputMask;
 		} else {
 			console.error(`Handset with id ${_id} is not registered to V7`);
@@ -140,7 +142,7 @@ class ModuleInstance extends InstanceBase {
 
 	async sendCommand(_body) {
 		let _url = `http://${this.config.unitIP}/command/${this.config.unitId}`;
-		console.log(`Sending command to ${_url}:`, _body);
+		console.log(`Attempting to send ${_url} this:`, _body);
 		try {
 			const _commandResponse = await Axios.post(_url, _body, {
 				headers: {
@@ -152,9 +154,6 @@ class ModuleInstance extends InstanceBase {
 			if (_commandResponse.status === 200) {
 				this.deviceData.fetchedCueType = _body['cueType'];
 			}
-
-			// Filter 2xx responses
-			this.filterResponseLog(_commandResponse);
 		} catch (_error) {
 			this.filterErrorLog(_error);
 		}
@@ -164,7 +163,7 @@ class ModuleInstance extends InstanceBase {
 	async fetchCues(_body) {
 		this.deviceData.fetchedCueType = '';
 		let _url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
-		console.log(`Fetching cues from ${_url}`);
+		console.log(`Attempting to fetch cues from ${_url}`);
 		try {
 			const _cueResponse = await Axios.get(_url, {
 				headers: {
@@ -182,12 +181,10 @@ class ModuleInstance extends InstanceBase {
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at;
 						this.deviceData.fetchedCueType = jsonResponse.type;
+						this.UpdateFetchedCueVariable();
 					}
 				}
 			}
-			
-			// Filter 2xx responses
-			this.filterResponseLog(_cueResponse);
 		} catch (_error) {
 			this.filterErrorLog(_error);
 		}
@@ -196,7 +193,7 @@ class ModuleInstance extends InstanceBase {
 
 	async fetchSettings(_body) {
 		let _url = `http://${this.config.unitIP}/settings/${this.config.unitId}`;
-		console.log(`Fetching settings from ${_url}`);
+		console.log(`Attempting to fetch settings from ${_url}`);
 		try {
 			const _settingsResponse = await Axios.get(_url, {
 				headers: {
@@ -211,7 +208,6 @@ class ModuleInstance extends InstanceBase {
 				this.deviceData.settings = _jsonResponse.settings;
 				this.deviceData.firstLoad = false;
 			}
-			this.filterResponseLog(_settingsResponse);
 		} catch (_error) {
 			this.filterErrorLog(_error);
 		}
