@@ -95,21 +95,13 @@ class ModuleInstance extends InstanceBase {
 	checkCues() {
 		clearTimeout(this.fastTimer);
 		this.fetchCues();
-    	this.fastTimer = setTimeout(() => { this.checkCues(); }, 500);
+    	this.fastTimer = setTimeout(() => { this.checkCues(); }, 100);
 	}
 
 	checkSettings() {
 		clearTimeout(this.slowTimer);
 		this.fetchSettings();
     	this.slowTimer = setTimeout(() => { this.checkSettings(); }, 2000);
-	}
-
-	// Updated when a new Cue Type has been received by the V7
-	// Triggers On variable change Event
-	UpdateFetchedCueVariable() {
-		this.setVariableValues({
-			'LastCueType': this.deviceData.fetchedCueType 
-		});
 	}
 
 	immediateCheckSettings() {
@@ -162,6 +154,7 @@ class ModuleInstance extends InstanceBase {
 
 	async fetchCues(_body) {
 		this.deviceData.fetchedCueType = '';
+		this.setVariableValues({ 'CueTrigger': this.deviceData.fetchedCueType });
 		let _url = `http://${this.config.unitIP}/cues/${this.config.unitId}`;
 		console.log(`Attempting to fetch cues from ${_url}`);
 		try {
@@ -181,7 +174,10 @@ class ModuleInstance extends InstanceBase {
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at;
 						this.deviceData.fetchedCueType = jsonResponse.type;
-						this.UpdateFetchedCueVariable();
+						this.setVariableValues({
+							'LastCueType': this.deviceData.fetchedCueType,
+							'CueTrigger': this.deviceData.fetchedCueType,
+						});
 					}
 				}
 			}
