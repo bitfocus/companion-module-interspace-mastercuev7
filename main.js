@@ -217,6 +217,7 @@ class ModuleInstance extends InstanceBase {
 						this.setVariableValues({
 							LastCueType: this.deviceData.fetchedCueType,
 							LastCueTime: cueTime,
+							LastCueTriggerInterval: jsonResponse.at,
 							CueTrigger: this.deviceData.fetchedCueType,
 						})
 					}
