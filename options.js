@@ -15,7 +15,7 @@ module.exports = {
 		type: 'textinput',
 		label: 'MasterCue ID (shown on screen)',
 		width: 8,
-		regex: "/^[0-9]+\\-[0-9]+\\-[0-9]+$/",
+		regex: '/^[0-9]+\\-[0-9]+\\-[0-9]+$/',
 		default: '001-123-456',
 	},
 
@@ -24,7 +24,7 @@ module.exports = {
 		type: 'textinput',
 		label: 'Handset ID',
 		width: 8,
-		regex: "/^[0-9]+\\-[0-9]+\\-[0-9]+$/",
+		regex: '/^[0-9]+\\-[0-9]+\\-[0-9]+$/',
 		default: '00-123-456',
 	},
 
@@ -48,7 +48,7 @@ module.exports = {
 			{ id: '3', label: 'Output 3' },
 			{ id: '4', label: 'Output 4' },
 			{ id: '5', label: 'Output 5' },
-			{ id: '6', label: 'Output 6' }
+			{ id: '6', label: 'Output 6' },
 		],
 		default: '1',
 	},
@@ -59,7 +59,7 @@ module.exports = {
 		label: 'Handset Label',
 		tooltip: 'Optional text label, which will be displayed on the screen of the V7 when a cue is active',
 		width: 8,
-		regex: "^[\w.-]+$",
+		regex: '^[\w.-]+$',
 		default: 'Alice',
 	},
 
@@ -74,7 +74,7 @@ module.exports = {
 			{ id: '4', label: 'Port 3' },
 			{ id: '8', label: 'Port 4' },
 			{ id: '16', label: 'Port 5' },
-			{ id: '32', label: 'Port 6' }
+			{ id: '32', label: 'Port 6' },
 		],
 		default: '1',
 	},
@@ -116,4 +116,4 @@ module.exports = {
 		],
 		default: 'next',
 	},
-};
+}
