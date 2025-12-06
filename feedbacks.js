@@ -1,104 +1,93 @@
 const Options = require('./options')
-const Styles = require('./styles')
+const Icons = require('./icons')
+const { combineRgb } = require('@companion-module/base')
 
-module.exports = async function(self) {
+module.exports = async function (self) {
 	self.setFeedbackDefinitions({
 		output_channel_feedback: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Output State',
 			description: 'Indicates current state of an Output',
+			defaultStyle: { bgColor: combineRgb(0, 255, 0) },
 			options: [Options.Output],
 			callback: async (feedback) => {
-				// V7 data unavailable
-				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
-				var fetchedPortData = self.deviceData.state.outputChannels;
-				if (fetchedPortData[feedback.options.outputNumber-1].isOn) {
-					if (fetchedPortData[feedback.options.outputNumber-1].isConnected) {
-						return Styles.OutputOn;
-					}
-					return Styles.OutputOff;
-				} else {
-					return Styles.Default;
-				}
-			}
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
+				const fetchedPortData = self.deviceData.state.outputChannels || []
+				const port = fetchedPortData[feedback.options.outputNumber - 1]
+				if (!port) return false
+				return port.isOn === true
+			},
 		},
 		next_feedback: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Next State',
 			description: 'Indicates state of Next Cue',
+			defaultStyle: { png64: Icons.FullNext },
 			options: [],
-			callback: async (feedback) => {
-				// V7 data unavailable
-				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
-				if (self.deviceData.state.outputsSuspended) {
-					return Styles.IdleNext;
-				}
-				return Styles.FullNext;
-			}
+			callback: async () => {
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
+				return self.deviceData.state.outputsSuspended === false
+			},
 		},
 		back_feedback: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Back State',
 			description: 'Indicates state of Back Cue',
+			defaultStyle: { png64: Icons.FullBack },
 			options: [],
-			callback: async (feedback) => {
-				// V7 data unavailable
-				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
-				if (self.deviceData.state.outputsSuspended) {
-					return Styles.IdleBack;
-				}
-				return Styles.FullBack;
-			}
+			callback: async () => {
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
+				return self.deviceData.state.outputsSuspended === false
+			},
 		},
 		blackout_feedback: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Blackout State',
 			description: 'Indicates state of Blackout Cue',
+			defaultStyle: { png64: Icons.FullBlackout },
 			options: [],
-			callback: async (feedback) => {
-				// V7 data unavailable
-				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
-				if (!self.deviceData.settings.misc.enableBlack) {
-					return Styles.IdleBlackout;
-				}
-				return Styles.FullBlackout;
-			}
+			callback: async () => {
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
+				return self.deviceData.settings?.misc?.enableBlack === true
+			},
 		},
 		technician_feedback: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'TM State',
 			description: 'Indicates state of Technician Mode',
-			options: [],
+			defaultStyle: { bgColor: combineRgb(0, 255, 0) },
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Technician Mode',
+					id: 'technicianMode',
+					choices: [
+						{ id: 'full', label: 'Cues: Full' },
+						{ id: 'lamp', label: 'Cues: Lamp Only' },
+					],
+					default: 'full',
+				},
+			],
 			callback: async (feedback) => {
-				// V7 data unavailable
-				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return;
-				if (self.deviceData.settings.misc.cueLightOnly) {
-					return Styles.LampOnly;
-				}
-				return Styles.FullCues;
-			}
+				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
+				const mode = feedback.options.technicianMode
+				if (mode === 'full') return self.deviceData.settings?.misc?.cueLightOnly === false
+				if (mode === 'lamp') return self.deviceData.settings?.misc?.cueLightOnly === true
+				return false
+			},
 		},
 		ack_cue_feedback: {
-			type: 'advanced',
+			type: 'boolean',
 			name: 'Acknowledge Cue',
 			description: 'Indicates Cue being received (Last Feedback step)',
+			defaultStyle: { bgcolor: combineRgb(0, 255, 0) },
 			options: [Options.CueType],
 			callback: async (feedback) => {
-				if (self.deviceData.firstLoad) return; // Haven't got V7 data yet
-				var _type = self.deviceData.fetchedCueType;
-				if (_type == 'forward') _type = 'next'; //...
-				// This button isn't of cueType
-				if (feedback.options.cueType != _type) {
-					return Styles.Default;
-				}
-				if (_type == 'next') {
-					return Styles.NextAck;
-				} else if (_type == 'back') {
-					return Styles.BackAck;
-				} else if (_type == 'black') {
-					return Styles.BlackoutAck;
-				}
-			}
+				if (self.deviceData.firstLoad) return false
+				let _type = self.deviceData.fetchedCueType
+				if (_type === 'forward') _type = 'next'
+				return feedback.options.cueType === _type
+			},
 		},
-	});
+	})
 }

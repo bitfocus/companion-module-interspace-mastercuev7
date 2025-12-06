@@ -5,8 +5,8 @@
 	"description": "Integration with Interspace Industries MasterCue V7",
 	"manufacturer": "Interspace Industries",
 	"products": ["MasterCue V7"],
-	"keywords": ["MasterCue","Cue","V7","Interspace"],
-	"version": "1.0.1",
+	"keywords": ["MasterCue", "Cue", "V7", "Interspace"],
+	"version": "0.0.0",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-interspace-mastercuev7",
 	"bugs": "https://github.com/bitfocus/companion-module-interspace-mastercuev7/issues",
@@ -26,7 +26,7 @@
 		}
 	],
 	"runtime": {
-		"type": "node18",
+		"type": "node22",
 		"api": "nodejs-ipc",
 		"apiVersion": "0.0.0",
 		"entrypoint": "../main.js"
