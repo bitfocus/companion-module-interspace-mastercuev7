@@ -153,7 +153,7 @@ class ModuleInstance extends InstanceBase {
 
 	updateHandsetData(_handsetData, _id, _label, _outputMask) {
 		// Resolves findIndex error when param is undefined
-		if (_id !== undefined) return
+		if (_id == undefined) return
 		const _index = _handsetData.findIndex((_item) => _item.id === _id)
 		if (_index !== -1) {
 			// Only overwrite label if Configure Action has label with content not (undefined/null/empty)
@@ -204,12 +204,15 @@ class ModuleInstance extends InstanceBase {
 				let _cueAge = jsonResponse.now - jsonResponse.at
 
 				// We've had a cue recently
-				if (_cueAge < 1500) {
+				if (_cueAge < 1500 || !this.deviceData.fetchedCueType) {
 					if (jsonResponse.at != this.lastCueAt) {
 						this.lastCueAt = jsonResponse.at
 						this.deviceData.fetchedCueType = jsonResponse.type
+						const ageMs = jsonResponse.now - jsonResponse.at
+						const cueTime = new Date(Date.now() - ageMs).toLocaleTimeString()
 						this.setVariableValues({
 							LastCueType: this.deviceData.fetchedCueType,
+							LastCueTime: cueTime,
 							CueTrigger: this.deviceData.fetchedCueType,
 						})
 					}
@@ -252,7 +255,9 @@ class ModuleInstance extends InstanceBase {
 			this.filterErrorLog(_error)
 		}
 		this.setVariableValues({
-			TechnicianMode: this.deviceData.settings?.misc?.cueLightOnly ? 'Cues: Lamp Only' : 'Cues: Full',
+			TechnicianMode: this.deviceData.settings?.misc?.cueLightOnly ? 'Lamp Only' : 'Full',
+			RegisteredHandsets: this.deviceData.settings?.handsets?.registered,
+			BlackoutMode: this.deviceData.settings?.misc?.enableBlack ? 'Enabled' : 'Disabled',
 		})
 		this.checkFeedbacks(
 			'output_channel_feedback',

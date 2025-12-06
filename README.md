@@ -33,7 +33,10 @@ After configuring the MasterCueV7 Connection, you have several options to custom
 **Available variables:**
 
 - LastCueType : Equals the last cue received by the V7 (forward/back/black)
+- LastCueTime : Shows time time of day the last cue was triggered
 - CueTrigger : Briefly equals the last cue received by the V7 (forward/back/black) before returning to an empty string
 - TechnicianMode : Shows current cue mode (Full or Lamp Only)
+- BlackoutMode : Shows if Blackout mode is active
+- RegisteredHandsets : Array of handset IDs currently registered to the system
 
 See [HELP.md](./companion/HELP.md) and [LICENSE](./LICENSE)

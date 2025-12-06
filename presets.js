@@ -3,9 +3,10 @@ const Icons = require('./icons')
 
 module.exports = async function (self) {
 	const ColorWhite = combineRgb(255, 255, 255)
-	const ColorGreen = combineRgb(0, 255, 0)
+	const ColorGreen = combineRgb(0, 200, 0)
 	const ColorBlack = combineRgb(0, 0, 0)
-	const ColorRed = combineRgb(255, 0, 0)
+	const ColorRed = combineRgb(200, 0, 0)
+
 	const presets = {}
 
 	// Build Output Enable buttons 1-6
@@ -129,6 +130,11 @@ module.exports = async function (self) {
 
 	self.setPresetDefinitions({
 		...presets,
+		CueControlHeader: {
+			type: 'text',
+			category: 'Cues',
+			name: 'Cue Control',
+		},
 		BackCue: {
 			type: 'button',
 			category: 'Cues',
@@ -237,10 +243,61 @@ module.exports = async function (self) {
 				},
 			],
 		},
+		CueStatusHeader: {
+			type: 'text',
+			category: 'Cues',
+			name: 'Cue Status',
+		},
+		LastCueStatus: {
+			type: 'button',
+			category: 'Cues',
+			name: 'Last Cue Status',
+			style: {
+				text: 'Last Cue:\\n$(interspace-mastercuev7:LastCueType)',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [],
+			feedbacks: [],
+		},
+		LastCueTime: {
+			type: 'button',
+			category: 'Cues',
+			name: 'Last Cue Time',
+			style: {
+				text: 'Last Cue Time:\\n$(interspace-mastercuev7:LastCueTime)',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [],
+			feedbacks: [],
+		},
 		BlackoutHeader: {
 			type: 'text',
 			category: 'Modes',
 			name: 'Blackout Mode',
+		},
+		BlackoutStatus: {
+			type: 'button',
+			category: 'Modes',
+			name: 'Blackout Status',
+			style: {
+				text: 'Blackout:\\n$(interspace-mastercuev7:BlackoutMode)',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorRed,
+			},
+			steps: [],
+			feedbacks: [
+				{
+					feedbackId: 'blackout_feedback',
+					style: {
+						bgcolor: ColorGreen,
+					},
+				},
+			],
 		},
 		EnableBlackout: {
 			type: 'button',
@@ -302,7 +359,7 @@ module.exports = async function (self) {
 			category: 'Modes',
 			name: 'TM Indicator',
 			style: {
-				text: '$(interspace-mastercuev7:TechnicianMode)',
+				text: 'Cues:\\n$(interspace-mastercuev7:TechnicianMode)',
 			},
 			steps: [],
 			feedbacks: [],
@@ -415,6 +472,24 @@ module.exports = async function (self) {
 							actionId: 'clear_all_handsets_action',
 						},
 					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		},
+		CurrentHandsets: {
+			type: 'button',
+			category: 'Handsets',
+			name: 'Current Handsets',
+			style: {
+				text: 'Current Handsets:\\n$(interspace-mastercuev7:RegisteredHandsets)',
+				size: 'auto',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [
+				{
+					down: [],
 					up: [],
 				},
 			],
