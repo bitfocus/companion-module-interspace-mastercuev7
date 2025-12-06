@@ -168,7 +168,7 @@ class ModuleInstance extends InstanceBase {
 
 	async sendCommand(_body) {
 		let _url = `http://${this.config.unitIP}/command/${this.config.unitId}`
-		this.log('debug', `Attempting to send ${_url} this:`, _body)
+		// this.log('debug', `Attempting to send ${_url} this:`, _body)
 		try {
 			const _commandResponse = await Axios.post(_url, _body, {
 				headers: {
@@ -190,7 +190,7 @@ class ModuleInstance extends InstanceBase {
 		this.deviceData.fetchedCueType = ''
 		this.setVariableValues({ CueTrigger: this.deviceData.fetchedCueType })
 		let _url = `http://${this.config.unitIP}/cues/${this.config.unitId}`
-		this.log('debug', `Attempting to fetch cues from ${_url}`)
+		// this.log('debug', `Attempting to fetch cues from ${_url}`)
 		try {
 			const _cueResponse = await Axios.get(_url, {
 				headers: {
@@ -231,7 +231,7 @@ class ModuleInstance extends InstanceBase {
 
 	async fetchSettings(_body) {
 		let _url = `http://${this.config.unitIP}/settings/${this.config.unitId}`
-		this.log('debug', `Attempting to fetch settings from ${_url}`)
+		// this.log('debug', `Attempting to fetch settings from ${_url}`)
 		try {
 			const _settingsResponse = await Axios.get(_url, {
 				headers: {
