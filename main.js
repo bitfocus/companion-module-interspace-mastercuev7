@@ -207,6 +207,7 @@ class ModuleInstance extends InstanceBase {
 		} catch (_error) {
 			this.filterErrorLog(_error);
 		}
+		this.setVariableValues({ 'TechnicianMode': this.deviceData.settings?.misc?.cueLightOnly ? 'Cues: Lamp Only' : 'Cues: Full' });
 		this.checkFeedbacks('output_channel_feedback', 
 							'next_feedback', 
 							'back_feedback', 

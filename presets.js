@@ -4,177 +4,114 @@ const { HandsetID } = require('./options');
 
 module.exports = async function (self) {
 	const ColorWhite = combineRgb(255, 255, 255)
+	const ColorGreen = combineRgb(0, 255, 0);
+	const ColorRed = combineRgb(255, 0, 0);
 	const ColorGrey = combineRgb(100, 100, 100);
 	const ColorBlack = combineRgb(0, 0, 0);
-	
+
+	const presets = {};
+
+	// Build Output Enable buttons 1-6
+	for (let i = 1; i <= 6; i++) {
+		presets[`OutputToggle${i}`] = {
+			type: 'button',
+			category: 'Outputs',
+			name: `Output Toggle ${i === 1 ? '' : i}`,
+			style: {
+				text: `${i}\\nTOGGLE`,
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+				down: [{
+					actionId: 'set_output_action',
+					options: {
+						outputNumber: i,
+						outputState: 'outputToggle'
+					}
+				}],
+				up: []
+			}],
+			feedbacks: [{
+				feedbackId: 'output_channel_feedback',
+				options: {
+					outputNumber: i
+				}
+			}]
+		};
+		presets[`OutputEnable${i}`] = {
+			type: 'button',
+			category: 'Outputs',
+			name: `Output Enable ${i}`,
+			style: {
+				text: `${i}\\nON`,
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+				png64: Styles.OutputOff.png64,
+			},
+			steps: [{
+				down: [{
+					actionId: 'set_output_action',
+					options: {
+						outputNumber: i,
+						outputState: 'outputOn'
+					}
+				}],
+				up: []
+			}],
+			feedbacks: [{
+				feedbackId: 'output_channel_feedback',
+				style: {
+					png64: Styles.OutputOn.png64,
+				},
+				options: {
+					outputNumber: i
+				}
+			}]
+		};
+		presets[`OutputDisable${i}`] = {
+			type: 'button',
+			category: 'Outputs',
+			name: `Output Disable ${i === 1 ? '' : i}`,
+			style: {
+				text: `${i}\\nOFF`,
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [{
+				down: [{
+					actionId: 'set_output_action',
+					options: {
+						outputNumber: i,
+						outputState: 'outputOff'
+					}
+				}],
+				up: []
+			}],
+			feedbacks: [{
+				feedbackId: 'output_channel_feedback',
+				style: {
+					png64: Styles.OutputOff.png64,
+				},
+				options: {
+					outputNumber: i
+				}
+			}]
+		};
+	}
+
 	self.setPresetDefinitions({
-		OutputEnable1 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Enable 1',
-			style: {
-				text: '1\\nON',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 1,
-							outputState: 'outputOn'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 1
-				}
-			}]
-		},
-		OutputEnable2 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Enable 2',
-			style: {
-				text: '2\\nON',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 2,
-							outputState: 'outputOn'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 2
-				}
-			}]
-		},
-		OutputEnable3 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Enable 3',
-			style: {
-				text: '3\\nON',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 3,
-							outputState: 'outputOn'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 3
-				}
-			}]
-		},
-		OutputEnable4 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Enable 4',
-			style: {
-				text: '4\\nON',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 4,
-							outputState: 'outputOn'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 4
-				}
-			}]
-		},
-		OutputEnable5 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Enable 5',
-			style: {
-				text: '5\\nON',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 5,
-							outputState: 'outputOn'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 5
-				}
-			}]
-		},
-		OutputEnable6 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Enable 6',
-			style: {
-				text: '6\\nON',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 6,
-							outputState: 'outputOn'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 6
-				}
-			}]
-		},
+		...presets,
 		NextCue : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Cues',
 			name: 'Next Cue',
-			style: Styles.FullNext,
+			style: {
+				png64: Styles.IdleNext.png64,
+			},
 			steps: [{
 					down: [{
 						actionId: 'send_cue_action',
@@ -186,16 +123,22 @@ module.exports = async function (self) {
 			}],
 			feedbacks: [{
 					feedbackId: 'next_feedback',
+					style: {
+						png64: Styles.FullNext.png64,
+					},
 				},{
 					feedbackId: 'ack_cue_feedback',
+					style: {
+						bgcolor: combineRgb(0, 255, 0),
+					},
 					options: {
-						cueType: 'next'
-					}
+						cueType: 'next',
+					},
 			}]
 		},
 		ClearHandsets : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Handsets',
 			name: 'Clear Handsets',
 			style: {
 				text: 'Clear Handsets',
@@ -213,173 +156,13 @@ module.exports = async function (self) {
 		},
 
 
-		OutputDisable1 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Disable',
-			style: {
-				text: '1\\nOFF',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 1,
-							outputState: 'outputOff'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 1
-				}
-			}]
-		},
-		OutputDisable2 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Disable 2',
-			style: {
-				text: '2\\nOFF',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 2,
-							outputState: 'outputOff'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 2
-				}
-			}]
-		},
-		OutputDisable3 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Disable 3',
-			style: {
-				text: '3\\nOFF',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 3,
-							outputState: 'outputOff'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 3
-				}
-			}]
-		},
-		OutputDisable4 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Disable 4',
-			style: {
-				text: '4\\nOFF',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 4,
-							outputState: 'outputOff'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 4
-				}
-			}]
-		},
-		OutputDisable5 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Disable 5',
-			style: {
-				text: '5\\nOFF',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 5,
-							outputState: 'outputOff'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 5
-				}
-			}]
-		},
-		OutputDisable6 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Disable 6',
-			style: {
-				text: '6\\nOFF',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 6,
-							outputState: 'outputOff'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 6
-				}
-			}]
-		},
 		BackCue : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Cues',
 			name: 'Back Cue',
-			style: Styles.FullBack,
+			style: {
+				png64: Styles.IdleBack.png64,
+			},
 			steps: [{
 					down: [{
 						actionId: 'send_cue_action',
@@ -391,16 +174,20 @@ module.exports = async function (self) {
 			}],
 			feedbacks: [{
 					feedbackId: 'back_feedback',
+					style:{ png64: Styles.FullBack.png64},
 				},{
 					feedbackId: 'ack_cue_feedback',
+					style: {
+						bgcolor: combineRgb(255, 0, 0),
+					},
 					options: {
-						cueType: 'back'
-					}
+						cueType: 'back',
+					},
 			}]
 		},
 		ResumeAll : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Outputs',
 			name: 'Resume All',
 			style: {
 				text: 'Resume All',
@@ -418,173 +205,11 @@ module.exports = async function (self) {
 		},
 
 
-		OutputToggle1 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Toggle',
-			style: {
-				text: '1\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 1,
-							outputState: 'outputToggle'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 1
-				}
-			}]
-		},
-		OutputToggle2 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Toggle 2',
-			style: {
-				text: '2\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 2,
-							outputState: 'outputToggle'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 2
-				}
-			}]
-		},
-		OutputToggle3 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Toggle 3',
-			style: {
-				text: '3\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 3,
-							outputState: 'outputToggle'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 3
-				}
-			}]
-		},
-		OutputToggle4 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Toggle 4',
-			style: {
-				text: '4\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 4,
-							outputState: 'outputToggle'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 4
-				}
-			}]
-		},
-		OutputToggle5 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Toggle 5',
-			style: {
-				text: '5\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 5,
-							outputState: 'outputToggle'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 5
-				}
-			}]
-		},
-		OutputToggle6 : {
-			type: 'button',
-			category: 'MasterCue',
-			name: 'Output Toggle 6',
-			style: {
-				text: '6\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [{
-					down: [{
-						actionId: 'set_output_action',
-						options: {
-							outputNumber: 6,
-							outputState: 'outputToggle'
-						}
-					}],
-					up: []
-			}],
-			feedbacks: [{
-				feedbackId: 'output_channel_feedback',
-				options: {
-					outputNumber: 6
-				}
-			}]
-		},
 		BlackoutCue : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Cues',
 			name: 'Blackout Cue',
-			style: Styles.FullBlackout,
+			style: { png64: Styles.IdleBlackout.png64},
 			steps: [{
 					down: [{
 						actionId: 'send_cue_action',
@@ -596,16 +221,20 @@ module.exports = async function (self) {
 			}],
 			feedbacks: [{
 					feedbackId: 'blackout_feedback',
+					style: { png64: Styles.FullBlackout.png64},
 				},{
 					feedbackId: 'ack_cue_feedback',
+					style: {
+						bgcolor: combineRgb(255, 255, 255),
+					},
 					options: {
 						cueType: 'black'
-					}
+					},
 			}]
 		},
 		SuspendAll : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Outputs',
 			name: 'Suspend All',
 			style: {
 				text: 'Suspend All',
@@ -625,7 +254,7 @@ module.exports = async function (self) {
 
 		OutputToggleMulti : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Outputs',
 			name: 'Output Toggle Multi',
 			style: {
 				text: 'Multi\\nTOGGLE',
@@ -647,7 +276,7 @@ module.exports = async function (self) {
 		},
 		EnableBlackout : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Modes',
 			name: 'Enable Blackout',
 			style: {
 				text: 'Enable Blackout',
@@ -668,7 +297,7 @@ module.exports = async function (self) {
 		},
 		DisableBlackout : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Modes',
 			name: 'Disable Blackout',
 			style: {
 				text: 'Disable Blackout',
@@ -689,7 +318,7 @@ module.exports = async function (self) {
 		},
 		TMFull : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Modes',
 			name: 'Set Full Cues',
 			style: {
 				text: 'Set Full Cues',
@@ -710,7 +339,7 @@ module.exports = async function (self) {
 		},
 		TMLampOnly : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Modes',
 			name: 'Set Lamp Only',
 			style: {
 				text: 'Set Lamp Only',
@@ -731,22 +360,69 @@ module.exports = async function (self) {
 		},
 		TMIndicator : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Modes',
 			name: 'TM Indicator',
 			style: {
-				text: 'Cues: ',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
+				text: '$(interspace-mastercuev7:TechnicianMode)',
 			},
 			steps: [],
+			feedbacks: []
+		},
+		TMFull: {
+			type: 'button',
+			category: 'Modes',
+			name: 'TM Full',
+			style: {
+				text: 'Full',
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_tm_action',
+						options: {
+							enableFullCues: true,
+						}
+					}],
+					up: []
+			}],
 			feedbacks: [{
 				feedbackId: 'technician_feedback',
+				style: {
+					bgcolor: ColorGreen,
+				},
+				options: {
+					technicianMode: 'full',
+				},
+			}]
+		},
+		TMLampOnly: {
+			type: 'button',
+			category: 'Modes',
+			name: 'TM Lamp Only',
+			style: {
+				text: 'Lamp Only',
+			},
+			steps: [{
+					down: [{
+						actionId: 'set_tm_action',
+						options: {
+							enableFullCues: false,
+						}
+					}],
+					up: []
+			}],
+			feedbacks: [{
+				feedbackId: 'technician_feedback',
+				style: {
+					bgcolor: ColorGreen,
+				},
+				options: {
+					technicianMode: 'lamp',
+				}
 			}]
 		},
 		ConfigureHandset : {
 			type: 'button',
-			category: 'MasterCue',
+			category: 'Handsets',
 			name: 'Configure Handset',
 			style: {
 				text: 'Configure Handset',

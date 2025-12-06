@@ -34,5 +34,6 @@ After configuring the MasterCueV7 Connection, you have several options to custom
 
  - LastCueType : Equals the last cue received by the V7 (forward/back/black)
  - CueTrigger : Briefly equals the last cue received by the V7 (forward/back/black) before returning to an empty string
+ - TechnicianMode : Shows current cue mode (Full or Lamp Only)
 
 See [HELP.md](./companion/HELP.md) and [LICENSE](./LICENSE)
