@@ -201,6 +201,10 @@ class ModuleInstance extends InstanceBase {
 			// Axios automatically throws for non-2xx status codes, so this is only reached for 2xx
 			if (_cueResponse.status === 200) {
 				const jsonResponse = _cueResponse.data
+				if (jsonResponse?.now === undefined || jsonResponse?.at === undefined) {
+					return
+				}
+
 				let _cueAge = jsonResponse.now - jsonResponse.at
 
 				// We've had a cue recently
