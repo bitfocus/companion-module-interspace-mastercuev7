@@ -8,8 +8,10 @@ const UpdateFeedbacks = require('./feedbacks')
 const UpdateVariableDefinitions = require('./variables')
 
 class ModuleInstance extends InstanceBase {
-	fastTimer = 0
-	slowTimer = 0
+	cuePoll = 0
+	settingsPoll = 0
+	connected = false
+	errorLogged = false
 
 	deviceData = {
 		firstLoad: true,
@@ -37,7 +39,13 @@ class ModuleInstance extends InstanceBase {
 	}
 	// When module gets deleted
 	async destroy() {
-		console.log('Destroy')
+		this.log('debug', 'Destroy')
+		if (this.cuePoll) {
+			clearTimeout(this.cuePoll)
+		}
+		if (this.settingsPoll) {
+			clearTimeout(this.settingsPoll)
+		}
 	}
 
 	async configUpdated(_config) {
@@ -67,51 +75,72 @@ class ModuleInstance extends InstanceBase {
 
 	// Server responded with a status code outside the 2xx range
 	filterErrorLog(_error) {
+		// Pause fast polling until we reconnect
+		if (this.cuePoll) {
+			clearTimeout(this.cuePoll)
+			this.cuePoll = 0
+		}
+		this.connected = false
+
+		// Only log the first error per disconnect to avoid flooding
+		const shouldLog = !this.errorLogged
+		this.errorLogged = true
+
 		if (_error.response) {
-			console.error(`HTTP error! status: ${_error.response.status}`)
-			if (_error.response.status === 404) {
-				console.error('V7 Not found: Check Connections config')
-			} else if (_error.response.status === 500) {
-				console.error('Server error')
-			} else {
-				console.error(`Unexpected status code: ${_error.response.status}`)
+			this.updateStatus(InstanceStatus.ConnectionFailure)
+			if (shouldLog) {
+				this.log('error', `HTTP error! status: ${_error.response.status}`)
+				if (_error.response.status === 404) {
+					this.log('error', 'V7 Not found: Check Connections config')
+				} else if (_error.response.status === 500) {
+					this.log('error', 'Server error')
+				} else {
+					this.log('error', `Unexpected status code: ${_error.response.status}`)
+				}
 			}
 		} else if (_error.request) {
 			// No response received, something went wrong with the request
-			if (_error.code === 'ECONNABORTED') {
-				console.error('Connection aborted: Check hardware setup')
-			} else if (_error.code === 'ERR_INVALID_URL') {
-				console.error('Invalid IP: Check Connections config')
-			} else {
-				console.error(`Network error: ${_error.message}`)
+			this.updateStatus(InstanceStatus.ConnectionFailure)
+			if (shouldLog) {
+				if (_error.code === 'ECONNABORTED') {
+					this.log('error', 'Connection aborted: Check hardware setup')
+				} else if (_error.code === 'ERR_INVALID_URL') {
+					this.log('error', 'Invalid IP: Check Connections config')
+				} else {
+					this.log('error', `Network error: ${_error.message}`)
+				}
 			}
 		} else {
 			// Something else happened
-			console.error(`Error: ${_error.message}`)
+			this.updateStatus(InstanceStatus.UnknownError)
+			if (shouldLog) {
+				this.log('error', `Error: ${_error.message}`)
+			}
 		}
 	}
 
 	checkCues() {
-		clearTimeout(this.fastTimer)
+		clearTimeout(this.cuePoll)
+		if (!this.connected) {
+			this.cuePoll = 0
+			return
+		}
 		this.fetchCues()
-		this.fastTimer = setTimeout(() => {
+		this.cuePoll = setTimeout(() => {
 			this.checkCues()
-		}, 100)
+		}, 500)
 	}
 
 	checkSettings() {
-		clearTimeout(this.slowTimer)
+		clearTimeout(this.settingsPoll)
 		this.fetchSettings()
-		this.slowTimer = setTimeout(() => {
+		this.settingsPoll = setTimeout(() => {
 			this.checkSettings()
-		}, 2000)
+		}, 5000)
 	}
 
 	immediateCheckSettings() {
-		clearTimeout(this.slowTimer)
-		this.slowTimer = setTimeout(() => {
-			this.checkSettings()
-		}, 50)
+		this.fetchSettings()
 	}
 
 	getOutputMask(_portMask) {
@@ -133,13 +162,13 @@ class ModuleInstance extends InstanceBase {
 			}
 			_handsetData[_index].outputMask = _outputMask
 		} else {
-			console.error(`Handset with id ${_id} is not registered to V7`)
+			this.log('error', `Handset with id ${_id} is not registered to V7`)
 		}
 	}
 
 	async sendCommand(_body) {
 		let _url = `http://${this.config.unitIP}/command/${this.config.unitId}`
-		console.log(`Attempting to send ${_url} this:`, _body)
+		this.log('debug', `Attempting to send ${_url} this:`, _body)
 		try {
 			const _commandResponse = await Axios.post(_url, _body, {
 				headers: {
@@ -161,7 +190,7 @@ class ModuleInstance extends InstanceBase {
 		this.deviceData.fetchedCueType = ''
 		this.setVariableValues({ CueTrigger: this.deviceData.fetchedCueType })
 		let _url = `http://${this.config.unitIP}/cues/${this.config.unitId}`
-		console.log(`Attempting to fetch cues from ${_url}`)
+		this.log('debug', `Attempting to fetch cues from ${_url}`)
 		try {
 			const _cueResponse = await Axios.get(_url, {
 				headers: {
@@ -194,7 +223,7 @@ class ModuleInstance extends InstanceBase {
 
 	async fetchSettings(_body) {
 		let _url = `http://${this.config.unitIP}/settings/${this.config.unitId}`
-		console.log(`Attempting to fetch settings from ${_url}`)
+		this.log('debug', `Attempting to fetch settings from ${_url}`)
 		try {
 			const _settingsResponse = await Axios.get(_url, {
 				headers: {
@@ -208,6 +237,16 @@ class ModuleInstance extends InstanceBase {
 				this.deviceData.state = _jsonResponse.state
 				this.deviceData.settings = _jsonResponse.settings
 				this.deviceData.firstLoad = false
+
+				if (!this.connected) {
+					this.connected = true
+					this.errorLogged = false
+					this.log('info', 'Connection to MasterCue V7')
+					this.updateStatus(InstanceStatus.Ok)
+					if (!this.cuePoll) {
+						this.checkCues()
+					}
+				}
 			}
 		} catch (_error) {
 			this.filterErrorLog(_error)

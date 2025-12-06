@@ -10,6 +10,11 @@ module.exports = async function (self) {
 
 	// Build Output Enable buttons 1-6
 	for (let i = 1; i <= 6; i++) {
+		presets[`OutputHeader${i}`] = {
+			type: 'text',
+			category: 'Outputs',
+			name: `Output ${i}`,
+		}
 		presets[`OutputToggle${i}`] = {
 			type: 'button',
 			category: 'Outputs',
@@ -232,6 +237,11 @@ module.exports = async function (self) {
 				},
 			],
 		},
+		BlackoutHeader: {
+			type: 'text',
+			category: 'Modes',
+			name: 'Blackout Mode',
+		},
 		EnableBlackout: {
 			type: 'button',
 			category: 'Modes',
@@ -281,6 +291,11 @@ module.exports = async function (self) {
 				},
 			],
 			feedbacks: [],
+		},
+		TechnicianHeader: {
+			type: 'text',
+			category: 'Modes',
+			name: 'Technician Mode',
 		},
 		TMIndicator: {
 			type: 'button',
@@ -404,6 +419,11 @@ module.exports = async function (self) {
 				},
 			],
 			feedbacks: [],
+		},
+		MultiHeader: {
+			type: 'text',
+			category: 'Outputs',
+			name: 'Multiple Outputs',
 		},
 		SuspendAll: {
 			type: 'button',
