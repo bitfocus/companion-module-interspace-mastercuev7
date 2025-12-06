@@ -59,7 +59,7 @@ module.exports = function (self) {
 			name: 'Suspend All',
 			description: 'Suspends all Outputs',
 			options: [],
-			callback: async (event) => {
+			callback: async () => {
 				await self.sendCommand({ command: 'suspendOutputs' })
 				self.immediateCheckSettings()
 			},
@@ -68,7 +68,7 @@ module.exports = function (self) {
 			name: 'Resume All',
 			description: 'Resumes all Outputs',
 			options: [],
-			callback: async (event) => {
+			callback: async () => {
 				await self.sendCommand({ command: 'resumeOutputs' })
 				self.immediateCheckSettings()
 			},
@@ -78,7 +78,7 @@ module.exports = function (self) {
 			name: 'Clear Handsets',
 			description: 'Clears all Handsets',
 			options: [],
-			callback: async (event) => {
+			callback: async () => {
 				await self.sendCommand({ command: 'clearAllHandsets' })
 				self.immediateCheckSettings()
 			},
@@ -103,7 +103,7 @@ module.exports = function (self) {
 			name: 'Factory Reset',
 			description: 'Resets all V7 settings to default',
 			options: [],
-			callback: async (event) => {
+			callback: async () => {
 				await self.sendCommand({ command: 'factoryReset' })
 				self.immediateCheckSettings()
 			},

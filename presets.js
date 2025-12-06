@@ -1,12 +1,9 @@
 const { combineRgb } = require('@companion-module/base')
 const Styles = require('./styles')
-const { HandsetID } = require('./options')
 
 module.exports = async function (self) {
 	const ColorWhite = combineRgb(255, 255, 255)
 	const ColorGreen = combineRgb(0, 255, 0)
-	const ColorRed = combineRgb(255, 0, 0)
-	const ColorGrey = combineRgb(100, 100, 100)
 	const ColorBlack = combineRgb(0, 0, 0)
 
 	const presets = {}
@@ -368,56 +365,6 @@ module.exports = async function (self) {
 							actionId: 'set_blackout_action',
 							options: {
 								enableBlackout: false,
-							},
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [],
-		},
-		TMFull: {
-			type: 'button',
-			category: 'Modes',
-			name: 'Set Full Cues',
-			style: {
-				text: 'Set Full Cues',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'set_tm_action',
-							options: {
-								enableFullCues: true,
-							},
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [],
-		},
-		TMLampOnly: {
-			type: 'button',
-			category: 'Modes',
-			name: 'Set Lamp Only',
-			style: {
-				text: 'Set Lamp Only',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'set_tm_action',
-							options: {
-								enableFullCues: false,
 							},
 						},
 					],

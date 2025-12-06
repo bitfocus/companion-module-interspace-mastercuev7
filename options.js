@@ -59,7 +59,7 @@ module.exports = {
 		label: 'Handset Label',
 		tooltip: 'Optional text label, which will be displayed on the screen of the V7 when a cue is active',
 		width: 8,
-		regex: '^[\w.-]+$',
+		regex: '^[.-]+$',
 		default: 'Alice',
 	},
 
