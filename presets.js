@@ -9,13 +9,12 @@ module.exports = async function (self) {
 
 	const presets = {}
 
-	// Build Output Enable buttons 1-6
+	presets[`OutputHeaderToggle`] = {
+		type: 'text',
+		category: 'Outputs',
+		name: 'Toggle Outputs',
+	}
 	for (let i = 1; i <= 6; i++) {
-		presets[`OutputHeader${i}`] = {
-			type: 'text',
-			category: 'Outputs',
-			name: `Output ${i}`,
-		}
 		presets[`OutputToggle${i}`] = {
 			type: 'button',
 			category: 'Outputs',
@@ -52,6 +51,13 @@ module.exports = async function (self) {
 				},
 			],
 		}
+	}
+	presets[`OutputHeaderEnable`] = {
+		type: 'text',
+		category: 'Outputs',
+		name: 'Enable Outputs',
+	}
+	for (let i = 1; i <= 6; i++) {
 		presets[`OutputEnable${i}`] = {
 			type: 'button',
 			category: 'Outputs',
@@ -89,6 +95,13 @@ module.exports = async function (self) {
 				},
 			],
 		}
+	}
+	presets[`OutputHeaderDisable`] = {
+		type: 'text',
+		category: 'Outputs',
+		name: 'Disable Outputs',
+	}
+	for (let i = 1; i <= 6; i++) {
 		presets[`OutputDisable${i}`] = {
 			type: 'button',
 			category: 'Outputs',
