@@ -140,7 +140,7 @@ module.exports = async function (self) {
 			category: 'Cues',
 			name: 'Back Cue',
 			style: {
-				png64: Icons.IdleBack,
+				png64: Icons.FullBack,
 			},
 			steps: [
 				{
@@ -158,7 +158,8 @@ module.exports = async function (self) {
 			feedbacks: [
 				{
 					feedbackId: 'back_feedback',
-					style: { png64: Icons.FullBack },
+					isInverted: true,
+					style: { png64: Icons.IdleBack },
 				},
 				{
 					feedbackId: 'ack_cue_feedback',
@@ -176,7 +177,7 @@ module.exports = async function (self) {
 			category: 'Cues',
 			name: 'Next Cue',
 			style: {
-				png64: Icons.IdleNext,
+				png64: Icons.FullNext,
 			},
 			steps: [
 				{
@@ -194,8 +195,9 @@ module.exports = async function (self) {
 			feedbacks: [
 				{
 					feedbackId: 'next_feedback',
+					isInverted: true,
 					style: {
-						png64: Icons.FullNext,
+						png64: Icons.IdleNext,
 					},
 				},
 				{
@@ -213,7 +215,7 @@ module.exports = async function (self) {
 			type: 'button',
 			category: 'Cues',
 			name: 'Blackout Cue',
-			style: { png64: Icons.IdleBlackout },
+			style: { png64: Icons.FullBlackout },
 			steps: [
 				{
 					down: [
@@ -230,7 +232,8 @@ module.exports = async function (self) {
 			feedbacks: [
 				{
 					feedbackId: 'blackout_feedback',
-					style: { png64: Icons.FullBlackout },
+					isInverted: true,
+					style: { png64: Icons.IdleBlackout },
 				},
 				{
 					feedbackId: 'ack_cue_feedback',
