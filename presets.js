@@ -1,11 +1,11 @@
 const { combineRgb } = require('@companion-module/base')
-const Styles = require('./styles')
+const Icons = require('./icons')
 
 module.exports = async function (self) {
 	const ColorWhite = combineRgb(255, 255, 255)
 	const ColorGreen = combineRgb(0, 255, 0)
 	const ColorBlack = combineRgb(0, 0, 0)
-
+	const ColorRed = combineRgb(255, 0, 0)
 	const presets = {}
 
 	// Build Output Enable buttons 1-6
@@ -18,7 +18,7 @@ module.exports = async function (self) {
 				text: `${i}\\nTOGGLE`,
 				size: '14',
 				color: ColorWhite,
-				bgcolor: ColorBlack,
+				bgcolor: ColorRed,
 			},
 			steps: [
 				{
@@ -37,6 +37,9 @@ module.exports = async function (self) {
 			feedbacks: [
 				{
 					feedbackId: 'output_channel_feedback',
+					style: {
+						bgcolor: ColorGreen,
+					},
 					options: {
 						outputNumber: i,
 					},
@@ -52,7 +55,7 @@ module.exports = async function (self) {
 				size: '14',
 				color: ColorWhite,
 				bgcolor: ColorBlack,
-				png64: Styles.OutputOff.png64,
+				png64: Icons.OutputOff,
 			},
 			steps: [
 				{
@@ -72,7 +75,7 @@ module.exports = async function (self) {
 				{
 					feedbackId: 'output_channel_feedback',
 					style: {
-						png64: Styles.OutputOn.png64,
+						bgcolor: ColorGreen,
 					},
 					options: {
 						outputNumber: i,
@@ -107,8 +110,9 @@ module.exports = async function (self) {
 			feedbacks: [
 				{
 					feedbackId: 'output_channel_feedback',
+					isInverted: true,
 					style: {
-						png64: Styles.OutputOff.png64,
+						bgcolor: ColorRed,
 					},
 					options: {
 						outputNumber: i,
@@ -120,12 +124,48 @@ module.exports = async function (self) {
 
 	self.setPresetDefinitions({
 		...presets,
+		BackCue: {
+			type: 'button',
+			category: 'Cues',
+			name: 'Back Cue',
+			style: {
+				png64: Icons.IdleBack,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'send_cue_action',
+							options: {
+								cueType: 'back',
+							},
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [
+				{
+					feedbackId: 'back_feedback',
+					style: { png64: Icons.FullBack },
+				},
+				{
+					feedbackId: 'ack_cue_feedback',
+					style: {
+						bgcolor: combineRgb(255, 0, 0),
+					},
+					options: {
+						cueType: 'back',
+					},
+				},
+			],
+		},
 		NextCue: {
 			type: 'button',
 			category: 'Cues',
 			name: 'Next Cue',
 			style: {
-				png64: Styles.IdleNext.png64,
+				png64: Icons.IdleNext,
 			},
 			steps: [
 				{
@@ -144,7 +184,7 @@ module.exports = async function (self) {
 				{
 					feedbackId: 'next_feedback',
 					style: {
-						png64: Styles.FullNext.png64,
+						png64: Icons.FullNext,
 					},
 				},
 				{
@@ -158,93 +198,11 @@ module.exports = async function (self) {
 				},
 			],
 		},
-		ClearHandsets: {
-			type: 'button',
-			category: 'Handsets',
-			name: 'Clear Handsets',
-			style: {
-				text: 'Clear Handsets',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'clear_all_handsets_action',
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [],
-		},
-
-		BackCue: {
-			type: 'button',
-			category: 'Cues',
-			name: 'Back Cue',
-			style: {
-				png64: Styles.IdleBack.png64,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'send_cue_action',
-							options: {
-								cueType: 'back',
-							},
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [
-				{
-					feedbackId: 'back_feedback',
-					style: { png64: Styles.FullBack.png64 },
-				},
-				{
-					feedbackId: 'ack_cue_feedback',
-					style: {
-						bgcolor: combineRgb(255, 0, 0),
-					},
-					options: {
-						cueType: 'back',
-					},
-				},
-			],
-		},
-		ResumeAll: {
-			type: 'button',
-			category: 'Outputs',
-			name: 'Resume All',
-			style: {
-				text: 'Resume All',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'resume_action',
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [],
-		},
-
 		BlackoutCue: {
 			type: 'button',
 			category: 'Cues',
 			name: 'Blackout Cue',
-			style: { png64: Styles.IdleBlackout.png64 },
+			style: { png64: Icons.IdleBlackout },
 			steps: [
 				{
 					down: [
@@ -261,7 +219,7 @@ module.exports = async function (self) {
 			feedbacks: [
 				{
 					feedbackId: 'blackout_feedback',
-					style: { png64: Styles.FullBlackout.png64 },
+					style: { png64: Icons.FullBlackout },
 				},
 				{
 					feedbackId: 'ack_cue_feedback',
@@ -273,55 +231,6 @@ module.exports = async function (self) {
 					},
 				},
 			],
-		},
-		SuspendAll: {
-			type: 'button',
-			category: 'Outputs',
-			name: 'Suspend All',
-			style: {
-				text: 'Suspend All',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'suspend_action',
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [],
-		},
-
-		OutputToggleMulti: {
-			type: 'button',
-			category: 'Outputs',
-			name: 'Output Toggle Multi',
-			style: {
-				text: 'Multi\\nTOGGLE',
-				size: '14',
-				color: ColorWhite,
-				bgcolor: ColorBlack,
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'set_multi_output_action',
-							options: {
-								outputNumbers: [1],
-								outputState: 'outputToggle',
-							},
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [],
 		},
 		EnableBlackout: {
 			type: 'button',
@@ -466,6 +375,98 @@ module.exports = async function (self) {
 								handsetId: '00-123-456',
 								handsetLabel: 'Alice',
 								outputMask: [1, 2, 4, 8, 16, 32],
+							},
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		},
+		ClearHandsets: {
+			type: 'button',
+			category: 'Handsets',
+			name: 'Clear Handsets',
+			style: {
+				text: 'Clear Handsets',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'clear_all_handsets_action',
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		},
+		SuspendAll: {
+			type: 'button',
+			category: 'Outputs',
+			name: 'Suspend All',
+			style: {
+				text: 'Suspend All',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'suspend_action',
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		},
+		ResumeAll: {
+			type: 'button',
+			category: 'Outputs',
+			name: 'Resume All',
+			style: {
+				text: 'Resume All',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'resume_action',
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		},
+		OutputToggleMulti: {
+			type: 'button',
+			category: 'Outputs',
+			name: 'Output Toggle Multi',
+			style: {
+				text: 'Multi\\nTOGGLE',
+				size: '14',
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'set_multi_output_action',
+							options: {
+								outputNumbers: [1],
+								outputState: 'outputToggle',
 							},
 						},
 					],

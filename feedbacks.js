@@ -1,5 +1,5 @@
 const Options = require('./options')
-const Styles = require('./styles')
+const Icons = require('./icons')
 const { combineRgb } = require('@companion-module/base')
 
 module.exports = async function (self) {
@@ -8,7 +8,7 @@ module.exports = async function (self) {
 			type: 'boolean',
 			name: 'Output State',
 			description: 'Indicates current state of an Output',
-			defaultStyle: { png64: Styles.OutputOn.png64 },
+			defaultStyle: { bgColor: combineRgb(0, 255, 0) },
 			options: [Options.Output],
 			callback: async (feedback) => {
 				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
@@ -22,7 +22,7 @@ module.exports = async function (self) {
 			type: 'boolean',
 			name: 'Next State',
 			description: 'Indicates state of Next Cue',
-			defaultStyle: { png64: Styles.FullNext.png64 },
+			defaultStyle: { png64: Icons.FullNext },
 			options: [],
 			callback: async () => {
 				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
@@ -33,7 +33,7 @@ module.exports = async function (self) {
 			type: 'boolean',
 			name: 'Back State',
 			description: 'Indicates state of Back Cue',
-			defaultStyle: { png64: Styles.FullBack.png64 },
+			defaultStyle: { png64: Icons.FullBack },
 			options: [],
 			callback: async () => {
 				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
@@ -44,7 +44,7 @@ module.exports = async function (self) {
 			type: 'boolean',
 			name: 'Blackout State',
 			description: 'Indicates state of Blackout Cue',
-			defaultStyle: { png64: Styles.FullBlackout.png64 },
+			defaultStyle: { png64: Icons.FullBlackout },
 			options: [],
 			callback: async () => {
 				if (self.deviceData.firstLoad || self.deviceData.state == undefined) return false
@@ -80,7 +80,7 @@ module.exports = async function (self) {
 			type: 'boolean',
 			name: 'Acknowledge Cue',
 			description: 'Indicates Cue being received (Last Feedback step)',
-			defaultStyle: { png64: Styles.NextAck.png64 },
+			defaultStyle: { bgcolor: combineRgb(0, 255, 0) },
 			options: [Options.CueType],
 			callback: async (feedback) => {
 				if (self.deviceData.firstLoad) return false
