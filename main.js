@@ -16,6 +16,12 @@ class ModuleInstance extends InstanceBase {
 	deviceData = {
 		firstLoad: true,
 		fetchedCueType: '',
+		lastForwardCueTime: '',
+		lastForwardCueInterval: '',
+		lastBackCueTime: '',
+		lastBackCueInterval: '',
+		lastBlackoutCueTime: '',
+		lastBlackoutCueInterval: '',
 
 		state: {},
 		settings: {},
@@ -214,11 +220,27 @@ class ModuleInstance extends InstanceBase {
 						this.deviceData.fetchedCueType = jsonResponse.type
 						const ageMs = jsonResponse.now - jsonResponse.at
 						const cueTime = new Date(Date.now() - ageMs).toLocaleTimeString()
+						if (this.deviceData.fetchedCueType === 'forward') {
+							this.deviceData.lastForwardCueTime = cueTime
+							this.deviceData.lastForwardCueInterval = jsonResponse.at
+						} else if (this.deviceData.fetchedCueType === 'back') {
+							this.deviceData.lastBackCueTime = cueTime
+							this.deviceData.lastBackCueInterval = jsonResponse.at
+						} else if (this.deviceData.fetchedCueType === 'black') {
+							this.deviceData.lastBlackoutCueTime = cueTime
+							this.deviceData.lastBlackoutCueInterval = jsonResponse.at
+						}
 						this.setVariableValues({
 							LastCueType: this.deviceData.fetchedCueType,
 							LastCueTime: cueTime,
 							LastCueTriggerInterval: jsonResponse.at,
 							CueTrigger: this.deviceData.fetchedCueType,
+							LastForwardCueTime: this.deviceData.lastForwardCueTime,
+							LastForwardCueInterval: this.deviceData.lastForwardCueInterval,
+							LastBackCueTime: this.deviceData.lastBackCueTime,
+							LastBackCueInterval: this.deviceData.lastBackCueInterval,
+							LastBlackoutCueTime: this.deviceData.lastBlackoutCueTime,
+							LastBlackoutCueInterval: this.deviceData.lastBlackoutCueInterval,
 						})
 					}
 				}
